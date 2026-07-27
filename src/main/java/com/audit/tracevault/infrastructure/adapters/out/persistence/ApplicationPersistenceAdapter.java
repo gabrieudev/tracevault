@@ -1,6 +1,5 @@
 package com.audit.tracevault.infrastructure.adapters.out.persistence;
 
-import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -30,7 +29,7 @@ public class ApplicationPersistenceAdapter implements ApplicationRepositoryPort 
     }
 
     @Override
-    public Application create(Application application) {
+    public Application save(Application application) {
         ApplicationEntity entity = applicationPersistenceMapper.toEntity(application);
         ApplicationEntity savedEntity = applicationRepositoryPort.save(entity);
         return applicationPersistenceMapper.toDomain(savedEntity);

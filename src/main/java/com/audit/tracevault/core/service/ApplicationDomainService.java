@@ -9,6 +9,7 @@ import com.audit.tracevault.core.exception.FailedCryptographyException;
 import com.audit.tracevault.core.exception.ResourceNotFoundException;
 import com.audit.tracevault.core.ports.in.ApplicationQueryInput;
 import com.audit.tracevault.core.ports.in.ApplicationUseCase;
+import com.audit.tracevault.core.ports.in.CreateApplicationOutput;
 import com.audit.tracevault.core.ports.in.PageResult;
 import com.audit.tracevault.core.ports.out.ApiKeyCryptographyRepositoryPort;
 import com.audit.tracevault.core.ports.out.ApplicationRepositoryPort;
@@ -24,7 +25,7 @@ public class ApplicationDomainService implements ApplicationUseCase {
     }
 
     @Override
-    public String create(Application application) {
+    public CreateApplicationOutput create(Application application) {
         String plainKey = apiKeyCryptographyRepositoryPort.generatePlainApiKey("aud")
                 .orElseThrow(() -> new FailedCryptographyException("Failed to generate plain API key"));
         String hashedKey = apiKeyCryptographyRepositoryPort.hashApiKey(plainKey)
@@ -35,9 +36,9 @@ public class ApplicationDomainService implements ApplicationUseCase {
         application.setStatus(ApplicationStatusEnum.ACTIVE);
         application.setApiKeyHash(hashedKey);
 
-        applicationRepositoryPort.create(application);
+        Application createdApplication = applicationRepositoryPort.save(application);
 
-        return plainKey;
+        return new CreateApplicationOutput(createdApplication.getId(), plainKey);
     }
 
     @Override
@@ -49,5 +50,38 @@ public class ApplicationDomainService implements ApplicationUseCase {
     public Application findById(UUID id) {
         return applicationRepositoryPort.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Application not found with id: " + id));
+    }
+
+    @Override
+    public Application update(UUID id, Application application) {
+        Application existingApplication = applicationRepositoryPort.findById(id)
+                .orElseThrow(
+                        () -> new ResourceNotFoundException("Application not found with id: " + id));
+
+        existingApplication.setName(application.getName());
+        existingApplication.setDescription(application.getDescription());
+        existingApplication.setStatus(application.getStatus());
+        existingApplication.setUpdatedAt(Instant.now());
+
+        return applicationRepositoryPort.save(existingApplication);
+    }
+
+    @Override
+    public String rotateKey(UUID id) {
+        Application existingApplication = applicationRepositoryPort.findById(id)
+                .orElseThrow(
+                        () -> new ResourceNotFoundException("Application not found with id: " + id));
+
+        String plainKey = apiKeyCryptographyRepositoryPort.generatePlainApiKey("aud")
+                .orElseThrow(() -> new FailedCryptographyException("Failed to generate plain API key"));
+        String hashedKey = apiKeyCryptographyRepositoryPort.hashApiKey(plainKey)
+                .orElseThrow(() -> new FailedCryptographyException("Failed to hash API key"));
+
+        existingApplication.setApiKeyHash(hashedKey);
+        existingApplication.setUpdatedAt(Instant.now());
+
+        applicationRepositoryPort.save(existingApplication);
+
+        return plainKey;
     }
 }

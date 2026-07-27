@@ -5,9 +5,13 @@ import java.util.UUID;
 import com.audit.tracevault.core.domain.Application;
 
 public interface ApplicationUseCase {
-    String create(Application application);
+    CreateApplicationOutput create(Application application);
 
     Application findById(UUID id);
 
     PageResult<Application> findAll(ApplicationQueryInput queryInput);
+
+    Application update(UUID id, Application application);
+
+    String rotateKey(UUID id);
 }

@@ -8,7 +8,7 @@ import com.audit.tracevault.core.ports.in.ApplicationQueryInput;
 import com.audit.tracevault.core.ports.in.PageResult;
 
 public interface ApplicationRepositoryPort {
-    Application create(Application application);
+    Application save(Application application);
 
     Optional<Application> findById(UUID id);
 
