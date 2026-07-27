@@ -7,6 +7,7 @@ import java.util.UUID;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.stereotype.Component;
 
 import com.audit.tracevault.core.domain.Application;
 import com.audit.tracevault.core.ports.in.ApplicationQueryInput;
@@ -18,6 +19,7 @@ import com.audit.tracevault.infrastructure.adapters.out.persistence.mapper.Appli
 import com.audit.tracevault.infrastructure.adapters.out.persistence.repository.SpringDataApplicationRepository;
 import com.audit.tracevault.infrastructure.adapters.out.persistence.specification.ApplicationSpecification;
 
+@Component
 public class ApplicationPersistenceAdapter implements ApplicationRepositoryPort {
     private final SpringDataApplicationRepository applicationRepositoryPort;
     private final ApplicationPersistenceMapper applicationPersistenceMapper;
@@ -44,17 +46,11 @@ public class ApplicationPersistenceAdapter implements ApplicationRepositoryPort 
                         : Sort.by(queryInput.sortBy()).descending()
         );
 
-        List<String> statusList = queryInput.status() != null
-                ? queryInput.status().stream()
-                .map(status -> status.name())
-                .toList()
-                : null;
-
         var spec = ApplicationSpecification.hasId(queryInput.id())
                 .and(ApplicationSpecification.search(queryInput.search()))
                 .and(ApplicationSpecification.hasName(queryInput.name()))
                 .and(ApplicationSpecification.hasDescription(queryInput.description()))
-                .and(ApplicationSpecification.hasStatusIn(statusList))
+                .and(ApplicationSpecification.hasStatusIn(queryInput.status()))
                 .and(ApplicationSpecification.createdFrom(queryInput.createdFrom()))
                 .and(ApplicationSpecification.createdTo(queryInput.createdTo()))
                 .and(ApplicationSpecification.updatedFrom(queryInput.updatedFrom()))

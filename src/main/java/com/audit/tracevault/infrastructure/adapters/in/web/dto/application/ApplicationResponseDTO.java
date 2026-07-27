@@ -16,7 +16,6 @@ public class ApplicationResponseDTO {
     private UUID id;
     private String name;
     private String description;
-    private String apiKeyHash;
     private ApplicationStatusEnum status;
     private Instant createdAt;
     private Instant updatedAt;

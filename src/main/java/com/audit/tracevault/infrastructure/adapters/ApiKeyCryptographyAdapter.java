@@ -7,8 +7,11 @@ import java.security.SecureRandom;
 import java.util.Base64;
 import java.util.Optional;
 
+import org.springframework.stereotype.Component;
+
 import com.audit.tracevault.core.ports.out.ApiKeyCryptographyRepositoryPort;
 
+@Component
 public class ApiKeyCryptographyAdapter implements ApiKeyCryptographyRepositoryPort {
     private static final int KEY_LENGTH_BYTES = 32;
 

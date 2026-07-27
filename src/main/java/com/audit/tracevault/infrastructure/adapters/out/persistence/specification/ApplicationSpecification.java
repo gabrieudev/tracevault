@@ -1,10 +1,12 @@
 package com.audit.tracevault.infrastructure.adapters.out.persistence.specification;
 
 import java.time.Instant;
+import java.util.Collection;
 import java.util.UUID;
 
 import org.springframework.data.jpa.domain.Specification;
 
+import com.audit.tracevault.core.domain.ApplicationStatusEnum;
 import com.audit.tracevault.infrastructure.adapters.out.persistence.entity.ApplicationEntity;
 
 public final class ApplicationSpecification {
@@ -37,10 +39,16 @@ public final class ApplicationSpecification {
                 : cb.equal(cb.lower(root.get("description")), description.toLowerCase());
     }
 
-    public static Specification<ApplicationEntity> hasStatusIn(Iterable<String> status) {
-        return (root, query, cb) -> status == null
-                ? cb.conjunction()
-                : root.get("status").in(status);
+    public static Specification<ApplicationEntity> hasStatusIn(
+            Collection<ApplicationStatusEnum> status) {
+
+        return (root, query, cb) -> {
+            if (status == null || status.isEmpty()) {
+                return cb.conjunction();
+            }
+
+            return root.get("status").in(status);
+        };
     }
 
     public static Specification<ApplicationEntity> createdFrom(Instant createdFrom) {

@@ -3,12 +3,13 @@ package com.audit.tracevault.infrastructure.adapters.out.persistence.entity;
 import java.time.Instant;
 import java.util.UUID;
 
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
+
 import com.audit.tracevault.core.domain.ApplicationStatusEnum;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -37,7 +38,7 @@ public class ApplicationEntity {
     private String apiKeyHash;
     
     @Column(name = "status", nullable = false)
-    @Enumerated(EnumType.STRING)
+    @JdbcTypeCode(SqlTypes.NAMED_ENUM)
     private ApplicationStatusEnum status;
     
     @Column(name = "created_at", nullable = false)
