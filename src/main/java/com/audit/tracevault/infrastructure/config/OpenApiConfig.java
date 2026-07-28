@@ -19,10 +19,10 @@ public class OpenApiConfig {
                 .info(new Info().title("TraceVault API")
                         .description(
                                 "TraceVault is a secure and efficient audit logging system that ensures the integrity and confidentiality of your logs")
-                        .version("v0.0.1")
+                        .version("v1.0.0")
                         .license(new License().name("Apache 2.0").url("http://springdoc.org")))
                 .externalDocs(new ExternalDocumentation()
                         .description("Project Repository")
-                        .url("https://github.com/gabrieudev/regex-builder"));
+                        .url("https://github.com/gabrieudev/tracevault"));
     }
 }
