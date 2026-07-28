@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.audit.tracevault.core.domain.Application;
 import com.audit.tracevault.core.domain.ApplicationStatusEnum;
-import com.audit.tracevault.core.ports.in.ApplicationQueryInput;
+import com.audit.tracevault.core.ports.in.ApplicationInputQuery;
 import com.audit.tracevault.core.ports.in.ApplicationUseCase;
 import com.audit.tracevault.core.ports.in.CreateApplicationOutput;
 import com.audit.tracevault.core.ports.in.PageResult;
@@ -106,7 +106,7 @@ public class ApplicationController {
 
                 UUID uuid = id != null ? UUID.fromString(id) : null;
 
-                ApplicationQueryInput input = applicationWebMapper.toInput(
+                ApplicationInputQuery input = applicationWebMapper.toInput(
                                 uuid,
                                 search,
                                 name,
@@ -217,5 +217,25 @@ public class ApplicationController {
                 return ResponseEntity
                                 .status(200)
                                 .body(new PlainKeyResponseDTO(uuid, newPlainKey));
+        }
+
+        @Operation(summary = "Get application by ID", description = """
+                        Retrieves the details of a specific application by its UUID.
+                        """)
+        @ApiResponses({
+                        @ApiResponse(responseCode = "200", description = "Application retrieved successfully"),
+                        @ApiResponse(responseCode = "404", description = "Application not found", content = @Content),
+                        @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content)
+        })
+        @GetMapping("/{id}")
+        public ResponseEntity<ApplicationResponseDTO> getById(
+                        @Parameter(description = "UUID of the application.", example = "5b3eb0f5-c1d8-44d7-9d8f-6220d52c0d12") @PathVariable String id) {
+                UUID uuid = id != null ? UUID.fromString(id) : null;
+
+                Application application = applicationUseCase.findById(uuid);
+
+                return ResponseEntity
+                                .status(200)
+                                .body(applicationWebMapper.toResponseDTO(application));
         }
 }

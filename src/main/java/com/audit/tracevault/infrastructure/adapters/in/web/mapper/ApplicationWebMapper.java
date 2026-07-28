@@ -10,7 +10,7 @@ import org.springframework.data.domain.Pageable;
 
 import com.audit.tracevault.core.domain.Application;
 import com.audit.tracevault.core.domain.ApplicationStatusEnum;
-import com.audit.tracevault.core.ports.in.ApplicationQueryInput;
+import com.audit.tracevault.core.ports.in.ApplicationInputQuery;
 import com.audit.tracevault.core.ports.in.CreateApplicationOutput;
 import com.audit.tracevault.core.ports.in.PageResult;
 import com.audit.tracevault.core.ports.in.SortDirection;
@@ -39,10 +39,17 @@ public interface ApplicationWebMapper {
 
         PlainKeyResponseDTO toCreateResponse(CreateApplicationOutput output);
 
-        default ApplicationQueryInput toInput(UUID id, String search, String name, String description,
+        default ApplicationInputQuery toInput(
+                        UUID id,
+                        String search,
+                        String name,
+                        String description,
                         List<ApplicationStatusEnum> status,
-                        String createdFrom, String createdTo, String updatedFrom, String updatedTo, Pageable pageable) {
-
+                        String createdFrom,
+                        String createdTo,
+                        String updatedFrom,
+                        String updatedTo,
+                        Pageable pageable) {
                 String sortBy = pageable.getSort().isSorted() ? pageable.getSort().iterator().next().getProperty()
                                 : null;
 
@@ -51,7 +58,7 @@ public interface ApplicationWebMapper {
                                                 : SortDirection.DESC)
                                 : null;
 
-                return new ApplicationQueryInput(
+                return new ApplicationInputQuery(
                                 id,
                                 search,
                                 name,

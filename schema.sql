@@ -47,7 +47,7 @@ CREATE TABLE audit_log (
     application_id   uuid NOT NULL,
     actor_id         text NOT NULL,
     actor_name       text,
-    actor_ip         inet,
+    actor_ip         text,
     actor_user_agent text,
     action           text NOT NULL,
     resource_type    text NOT NULL,

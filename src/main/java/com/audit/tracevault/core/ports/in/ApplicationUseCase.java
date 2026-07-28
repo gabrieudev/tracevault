@@ -9,7 +9,7 @@ public interface ApplicationUseCase {
 
     Application findById(UUID id);
 
-    PageResult<Application> findAll(ApplicationQueryInput queryInput);
+    PageResult<Application> findAll(ApplicationInputQuery queryInput);
 
     Application update(UUID id, Application application);
 

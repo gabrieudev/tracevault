@@ -7,7 +7,7 @@ import com.audit.tracevault.core.domain.Application;
 import com.audit.tracevault.core.domain.ApplicationStatusEnum;
 import com.audit.tracevault.core.exception.FailedCryptographyException;
 import com.audit.tracevault.core.exception.ResourceNotFoundException;
-import com.audit.tracevault.core.ports.in.ApplicationQueryInput;
+import com.audit.tracevault.core.ports.in.ApplicationInputQuery;
 import com.audit.tracevault.core.ports.in.ApplicationUseCase;
 import com.audit.tracevault.core.ports.in.CreateApplicationOutput;
 import com.audit.tracevault.core.ports.in.PageResult;
@@ -42,7 +42,7 @@ public class ApplicationDomainService implements ApplicationUseCase {
     }
 
     @Override
-    public PageResult<Application> findAll(ApplicationQueryInput queryInput) {
+    public PageResult<Application> findAll(ApplicationInputQuery queryInput) {
         return applicationRepositoryPort.findAll(queryInput);
     }
 

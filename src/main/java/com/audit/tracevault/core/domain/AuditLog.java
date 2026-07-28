@@ -18,7 +18,7 @@ public class AuditLog {
     private Map<String, Object> newValues;
     private Map<String, Object> metadata;
     private SeverityEnum severity;
-    private Instant timestamp;
+    private Instant occurredAt;
     private Instant createdAt;
 
     public UUID getId() {
@@ -125,12 +125,12 @@ public class AuditLog {
         this.severity = severity;
     }
 
-    public Instant getTimestamp() {
-        return timestamp;
+    public Instant getOccurredAt() {
+        return occurredAt;
     }
 
-    public void setTimestamp(Instant timestamp) {
-        this.timestamp = timestamp;
+    public void setOccurredAt(Instant occurredAt) {
+        this.occurredAt = occurredAt;
     }
 
     public Instant getCreatedAt() {
@@ -144,7 +144,7 @@ public class AuditLog {
     public AuditLog(UUID id, Application application, String actorId, String actorName, String actorIp,
             String actorUserAgent, AuditLogActionEnum action, String resourceType, String resourceId,
             Map<String, Object> oldValues, Map<String, Object> newValues, Map<String, Object> metadata,
-            SeverityEnum severity, Instant timestamp, Instant createdAt) {
+            SeverityEnum severity, Instant occurredAt, Instant createdAt) {
         this.id = id;
         this.application = application;
         this.actorId = actorId;
@@ -158,7 +158,7 @@ public class AuditLog {
         this.newValues = newValues;
         this.metadata = metadata;
         this.severity = severity;
-        this.timestamp = timestamp;
+        this.occurredAt = occurredAt;
         this.createdAt = createdAt;
     }
 

@@ -4,7 +4,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 import com.audit.tracevault.core.domain.Application;
-import com.audit.tracevault.core.ports.in.ApplicationQueryInput;
+import com.audit.tracevault.core.ports.in.ApplicationInputQuery;
 import com.audit.tracevault.core.ports.in.PageResult;
 
 public interface ApplicationRepositoryPort {
@@ -12,5 +12,7 @@ public interface ApplicationRepositoryPort {
 
     Optional<Application> findById(UUID id);
 
-    PageResult<Application> findAll(ApplicationQueryInput queryInput);
+    Optional<Application> findByApiKeyHash(String apiKeyHash);
+
+    PageResult<Application> findAll(ApplicationInputQuery queryInput);
 }

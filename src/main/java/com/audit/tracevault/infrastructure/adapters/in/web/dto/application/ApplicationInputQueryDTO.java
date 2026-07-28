@@ -15,7 +15,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class ApplicationQueryInputDTO {
+public class ApplicationInputQueryDTO {
     private UUID id;
     private String search;
     private String name;

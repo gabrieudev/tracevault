@@ -10,6 +10,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import com.audit.tracevault.core.exception.FailedCryptographyException;
 import com.audit.tracevault.core.exception.ResourceNotFoundException;
 import com.audit.tracevault.infrastructure.adapters.in.web.dto.ApiErrorResponse;
 
@@ -29,6 +30,12 @@ public class GlobalExceptionHandler {
                 .collect(Collectors.joining("; "));
         return ResponseEntity.status(HttpStatus.UNPROCESSABLE_CONTENT)
             .body(new ApiErrorResponse(false, "Validation error: " + errorMessage));
+    }
+
+    @ExceptionHandler(FailedCryptographyException.class)
+    public ResponseEntity<ApiErrorResponse> handleCryptography(FailedCryptographyException ex) {
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(new ApiErrorResponse(false, "Cryptography error: " + ex.getMessage()));
     }
 
     @ExceptionHandler(DataIntegrityViolationException.class)
