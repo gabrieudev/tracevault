@@ -1,6 +1,7 @@
 package com.audit.tracevault.infrastructure.adapters.in.web;
 
 import java.time.Instant;
+import java.util.List;
 import java.util.UUID;
 
 import org.springframework.data.domain.Pageable;
@@ -154,19 +155,13 @@ public class AuditLogController {
 
             @Parameter(description = "Maximum creation timestamp (ISO-8601).", example = "2026-12-31T23:59:59Z", in = ParameterIn.QUERY) @RequestParam(required = false) String createdTo,
 
-            @Parameter(description = """
-                    Pagination parameters.
+            @RequestParam(required = false) Integer page,
 
-                    page = zero-based page index
+            @RequestParam(required = false) Integer size,
 
-                    size = number of records per page
+            @RequestParam(required = false) List<String> sort,
 
-                    sort = property,direction
-
-                    Example:
-
-                    page=0&size=20&sort=occurredAt,desc
-                    """) Pageable pageable) {
+            @Parameter(hidden = true) Pageable pageable) {
 
         AuditLogInputQuery queryInput = auditLogWebMapper.toInput(
                 search,
@@ -184,7 +179,7 @@ public class AuditLogController {
                 occurredAtTo != null ? Instant.parse(occurredAtTo) : null,
                 createdFrom != null ? Instant.parse(createdFrom) : null,
                 createdTo != null ? Instant.parse(createdTo) : null,
-                pageable);
+                pageable.isPaged() ? pageable : Pageable.unpaged());
 
         PageResponse<AuditLogResponseDTO> response = auditLogWebMapper.toPageResponse(
                 auditLogUseCase.findAll(queryInput));

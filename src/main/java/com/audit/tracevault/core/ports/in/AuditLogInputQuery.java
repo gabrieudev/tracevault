@@ -22,8 +22,8 @@ public record AuditLogInputQuery(
         Instant occurredAtTo,
         Instant createdFrom,
         Instant createdTo,
-        int page,
-        int size,
+        Integer page,
+        Integer size,
         String sortBy,
         SortDirection sortDirection) {
 }

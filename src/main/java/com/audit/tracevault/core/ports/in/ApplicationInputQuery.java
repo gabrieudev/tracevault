@@ -16,8 +16,8 @@ public record ApplicationInputQuery(
         Instant createdTo,
         Instant updatedFrom,
         Instant updatedTo,
-        int page,
-        int size,
+        Integer page,
+        Integer size,
         String sortBy,
         SortDirection sortDirection) {
 }

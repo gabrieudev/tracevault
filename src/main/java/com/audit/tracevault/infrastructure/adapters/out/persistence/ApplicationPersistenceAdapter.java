@@ -5,6 +5,7 @@ import java.util.UUID;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
 
@@ -38,12 +39,24 @@ public class ApplicationPersistenceAdapter implements ApplicationRepositoryPort 
 
         @Override
         public PageResult<Application> findAll(ApplicationInputQuery queryInput) {
-                var pageable = PageRequest.of(
-                                queryInput.page(),
-                                queryInput.size(),
-                                queryInput.sortDirection() == SortDirection.ASC
-                                                ? Sort.by(queryInput.sortBy()).ascending()
-                                                : Sort.by(queryInput.sortBy()).descending());
+                boolean isPaged = queryInput.page() != null && queryInput.size() != null;
+
+                String sortBy = Optional.ofNullable(queryInput.sortBy())
+                                .filter(s -> !s.isBlank())
+                                .orElse("createdAt");
+
+                SortDirection direction = Optional.ofNullable(queryInput.sortDirection())
+                                .orElse(SortDirection.DESC);
+
+                Sort sort = Sort.by(sortBy);
+
+                sort = direction == SortDirection.ASC
+                                ? sort.ascending()
+                                : sort.descending();
+
+                Pageable pageable = isPaged
+                                ? PageRequest.of(queryInput.page(), queryInput.size(), sort)
+                                : Pageable.unpaged(sort);
 
                 var spec = ApplicationSpecification.hasId(queryInput.id())
                                 .and(ApplicationSpecification.search(queryInput.search()))

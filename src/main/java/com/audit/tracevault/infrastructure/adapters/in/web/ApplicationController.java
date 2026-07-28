@@ -90,24 +90,15 @@ public class ApplicationController {
 
                         @Parameter(name = "updatedTo", description = "Update end date (ISO-8601).", example = "2026-12-31T23:59:59Z", in = ParameterIn.QUERY) @RequestParam(required = false) String updatedTo,
 
-                        @Parameter(description = """
-                                        Pagination information.
+                        @RequestParam(required = false) Integer page,
 
-                                        page = page number (starts at 0)
+                        @RequestParam(required = false) Integer size,
 
-                                        size = number of records
+                        @RequestParam(required = false) List<String> sort,
 
-                                        sort = field,direction
-
-                                        Example:
-
-                                        page=0&size=20&sort=name,asc
-                                        """) Pageable pageable) {
-
-                UUID uuid = id != null ? UUID.fromString(id) : null;
-
+                        @Parameter(hidden = true) Pageable pageable) {
                 ApplicationInputQuery input = applicationWebMapper.toInput(
-                                uuid,
+                                id != null ? UUID.fromString(id) : null,
                                 search,
                                 name,
                                 description,
@@ -116,7 +107,7 @@ public class ApplicationController {
                                 createdTo,
                                 updatedFrom,
                                 updatedTo,
-                                pageable);
+                                pageable.isPaged() ? pageable : Pageable.unpaged());
 
                 PageResult<Application> pageResult = applicationUseCase.findAll(input);
 
