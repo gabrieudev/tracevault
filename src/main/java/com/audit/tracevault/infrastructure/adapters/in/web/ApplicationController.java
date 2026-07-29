@@ -54,7 +54,7 @@ public class ApplicationController {
                 this.applicationUseCase = applicationUseCase;
                 this.applicationWebMapper = applicationWebMapper;
         }
-
+        
         @Operation(summary = "List applications", description = """
                         Returns a paginated list of applications.
 

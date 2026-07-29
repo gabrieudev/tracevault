@@ -6,9 +6,11 @@ import org.springframework.context.annotation.Configuration;
 import com.audit.tracevault.core.ports.out.ApiKeyCryptographyRepositoryPort;
 import com.audit.tracevault.core.ports.out.ApplicationRepositoryPort;
 import com.audit.tracevault.core.ports.out.AuditLogRepositoryPort;
+import com.audit.tracevault.core.ports.out.WebhookRepositoryPort;
 import com.audit.tracevault.core.service.ApiKeyCryptographyDomainService;
 import com.audit.tracevault.core.service.ApplicationDomainService;
 import com.audit.tracevault.core.service.AuditLogService;
+import com.audit.tracevault.core.service.WebhookService;
 
 @Configuration
 public class DomainConfig {
@@ -16,6 +18,11 @@ public class DomainConfig {
     ApplicationDomainService applicationDomainService(ApplicationRepositoryPort applicationRepositoryPort,
             ApiKeyCryptographyRepositoryPort apiKeyCryptographyRepositoryPort) {
         return new ApplicationDomainService(applicationRepositoryPort, apiKeyCryptographyRepositoryPort);
+    }
+
+    @Bean
+    WebhookService webhookService(WebhookRepositoryPort webhookRepositoryPort) {
+        return new WebhookService(webhookRepositoryPort);
     }
 
     @Bean
