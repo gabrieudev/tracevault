@@ -5,9 +5,9 @@ import java.util.UUID;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 
-import com.audit.tracevault.infrastructure.adapters.out.persistence.entity.WebhookEntity;
+import com.audit.tracevault.infrastructure.adapters.out.persistence.entity.AlertRulesEntity;
 
-public interface SpringDataWebhookRepository
-        extends JpaRepository<WebhookEntity, UUID>, JpaSpecificationExecutor<WebhookEntity> {
+public interface SpringDataAlertRulesRepository
+        extends JpaRepository<AlertRulesEntity, UUID>, JpaSpecificationExecutor<AlertRulesEntity> {
 
 }

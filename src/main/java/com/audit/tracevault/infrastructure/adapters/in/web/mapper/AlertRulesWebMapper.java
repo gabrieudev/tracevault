@@ -7,36 +7,38 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.springframework.data.domain.Pageable;
 
-import com.audit.tracevault.core.domain.Webhook;
+import com.audit.tracevault.core.domain.AlertRules;
+import com.audit.tracevault.core.domain.ChannelTypeEnum;
+import com.audit.tracevault.core.ports.in.AlertRulesInputQuery;
 import com.audit.tracevault.core.ports.in.PageResult;
 import com.audit.tracevault.core.ports.in.SortDirection;
-import com.audit.tracevault.core.ports.in.WebhookInputQuery;
 import com.audit.tracevault.infrastructure.adapters.in.web.dto.PageResponse;
-import com.audit.tracevault.infrastructure.adapters.in.web.dto.webhook.UpdateWebhookDTO;
-import com.audit.tracevault.infrastructure.adapters.in.web.dto.webhook.WebhookRequestDTO;
-import com.audit.tracevault.infrastructure.adapters.in.web.dto.webhook.WebhookResponseDTO;
+import com.audit.tracevault.infrastructure.adapters.in.web.dto.alertrules.AlertRulesRequestDTO;
+import com.audit.tracevault.infrastructure.adapters.in.web.dto.alertrules.AlertRulesResponseDTO;
+import com.audit.tracevault.infrastructure.adapters.in.web.dto.alertrules.UpdateAlertRulesDTO;
 
 @Mapper(componentModel = "spring")
-public interface WebhookWebMapper {
+public interface AlertRulesWebMapper {
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "createdAt", ignore = true)
     @Mapping(target = "updatedAt", ignore = true)
     @Mapping(target = "isActive", ignore = true)
-    Webhook toDomain(WebhookRequestDTO webhookRequestDTO);
+    AlertRules toDomain(AlertRulesRequestDTO webhookRequestDTO);
 
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "createdAt", ignore = true)
     @Mapping(target = "updatedAt", ignore = true)
     @Mapping(target = "isActive", ignore = true)
-    Webhook toDomain(UpdateWebhookDTO updateWebhookDTO);
+    AlertRules toDomain(UpdateAlertRulesDTO updateWebhookDTO);
 
-    WebhookResponseDTO toResponseDTO(Webhook webhook);
+    AlertRulesResponseDTO toResponseDTO(AlertRules webhook);
 
-    default WebhookInputQuery toInput(
+    default AlertRulesInputQuery toInput(
             UUID id,
             String search,
             UUID applicationId,
-            String endpointUrl,
+            String messageTemplate,
+            ChannelTypeEnum channelType,
             String[] triggerEvents,
             String minSeverity,
             Boolean isActive,
@@ -53,11 +55,12 @@ public interface WebhookWebMapper {
                         : SortDirection.DESC)
                 : null;
 
-        return new WebhookInputQuery(
+        return new AlertRulesInputQuery(
                 id,
                 search,
                 applicationId,
-                endpointUrl,
+                messageTemplate,
+                channelType,
                 triggerEvents,
                 minSeverity,
                 isActive,
@@ -71,7 +74,7 @@ public interface WebhookWebMapper {
                 sortDirection);
     }
 
-    default PageResponse<WebhookResponseDTO> toPageResponse(PageResult<Webhook> page) {
+    default PageResponse<AlertRulesResponseDTO> toPageResponse(PageResult<AlertRules> page) {
         return new PageResponse<>(
                 page.content().stream().map(this::toResponseDTO).toList(),
                 page.page(),

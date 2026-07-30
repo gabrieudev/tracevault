@@ -14,12 +14,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.audit.tracevault.core.ports.in.WebhookInputQuery;
-import com.audit.tracevault.core.ports.in.WebhookUseCase;
+import com.audit.tracevault.core.domain.ChannelTypeEnum;
+import com.audit.tracevault.core.ports.in.AlertRulesInputQuery;
+import com.audit.tracevault.core.ports.in.AlertRulesUseCase;
 import com.audit.tracevault.infrastructure.adapters.in.web.dto.PageResponse;
-import com.audit.tracevault.infrastructure.adapters.in.web.dto.webhook.WebhookRequestDTO;
-import com.audit.tracevault.infrastructure.adapters.in.web.dto.webhook.WebhookResponseDTO;
-import com.audit.tracevault.infrastructure.adapters.in.web.mapper.WebhookWebMapper;
+import com.audit.tracevault.infrastructure.adapters.in.web.dto.alertrules.AlertRulesRequestDTO;
+import com.audit.tracevault.infrastructure.adapters.in.web.dto.alertrules.AlertRulesResponseDTO;
+import com.audit.tracevault.infrastructure.adapters.in.web.mapper.AlertRulesWebMapper;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -35,14 +36,14 @@ import jakarta.validation.Valid;
         """)
 @RestController
 @RequestMapping("/webhooks")
-public class WebhookController {
+public class AlertRulesController {
 
-    private final WebhookUseCase webhookUseCase;
-    private final WebhookWebMapper webhookWebMapper;
+    private final AlertRulesUseCase webhookUseCase;
+    private final AlertRulesWebMapper webhookWebMapper;
 
-    public WebhookController(
-            WebhookUseCase webhookUseCase,
-            WebhookWebMapper webhookWebMapper) {
+    public AlertRulesController(
+            AlertRulesUseCase webhookUseCase,
+            AlertRulesWebMapper webhookWebMapper) {
 
         this.webhookUseCase = webhookUseCase;
         this.webhookWebMapper = webhookWebMapper;
@@ -61,14 +62,14 @@ public class WebhookController {
             @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content)
     })
     @PostMapping
-    public ResponseEntity<WebhookResponseDTO> create(
+    public ResponseEntity<AlertRulesResponseDTO> create(
 
             @io.swagger.v3.oas.annotations.parameters.RequestBody(required = true, description = """
                     Webhook configuration.
 
                     Contains the destination URL, subscribed events,
                     severity filters and activation status.
-                    """) @RequestBody @Valid WebhookRequestDTO webhookRequestDTO) {
+                    """) @RequestBody @Valid AlertRulesRequestDTO webhookRequestDTO) {
 
         var webhook = webhookWebMapper.toDomain(webhookRequestDTO);
         var createdWebhook = webhookUseCase.create(webhook);
@@ -87,7 +88,7 @@ public class WebhookController {
             @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content)
     })
     @GetMapping("/{id}")
-    public ResponseEntity<WebhookResponseDTO> getById(
+    public ResponseEntity<AlertRulesResponseDTO> getById(
 
             @Parameter(description = "Webhook UUID.", example = "90eb5651-0a9c-4d52-a1ea-fd7a75606c5e") @PathVariable String id) {
 
@@ -113,7 +114,7 @@ public class WebhookController {
             @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content)
     })
     @GetMapping
-    public ResponseEntity<PageResponse<WebhookResponseDTO>> getAll(
+    public ResponseEntity<PageResponse<AlertRulesResponseDTO>> getAll(
 
             @Parameter(description = "Webhook UUID.", example = "90eb5651-0a9c-4d52-a1ea-fd7a75606c5e", in = ParameterIn.QUERY) @RequestParam(required = false) String id,
 
@@ -121,7 +122,9 @@ public class WebhookController {
 
             @Parameter(description = "Application UUID.", example = "9f8de7ea-f483-4c73-86ba-1dcdb07ca5cf", in = ParameterIn.QUERY) @RequestParam(required = false) String applicationId,
 
-            @Parameter(description = "Webhook endpoint URL.", example = "https://example.com/webhooks/audit", in = ParameterIn.QUERY) @RequestParam(required = false) String endpointUrl,
+            @Parameter(description = "Webhook message template.", example = "A new user has been created: {username}", in = ParameterIn.QUERY) @RequestParam(required = false) String messageTemplate,
+
+            @Parameter(description = "Webhook channel type.", example = "EMAIL", in = ParameterIn.QUERY) @RequestParam(required = false) ChannelTypeEnum channelType,
 
             @Parameter(description = "Subscribed trigger events.", example = "USER_CREATED", in = ParameterIn.QUERY) @RequestParam(required = false) String[] triggerEvents,
 
@@ -161,11 +164,12 @@ public class WebhookController {
 
             @Parameter(hidden = true) Pageable pageable) {
 
-        WebhookInputQuery query = webhookWebMapper.toInput(
+        AlertRulesInputQuery query = webhookWebMapper.toInput(
                 id != null ? UUID.fromString(id) : null,
                 search,
                 applicationId != null ? UUID.fromString(applicationId) : null,
-                endpointUrl,
+                messageTemplate,
+                channelType,
                 triggerEvents,
                 minSeverity,
                 isActive,
@@ -175,7 +179,7 @@ public class WebhookController {
                 updatedTo != null ? Instant.parse(updatedTo) : null,
                 pageable.isPaged() ? pageable : Pageable.unpaged());
 
-        PageResponse<WebhookResponseDTO> response = webhookWebMapper.toPageResponse(
+        PageResponse<AlertRulesResponseDTO> response = webhookWebMapper.toPageResponse(
                 webhookUseCase.findAll(query));
 
         return ResponseEntity.status(200).body(response);

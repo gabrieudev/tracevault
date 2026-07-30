@@ -3,22 +3,22 @@ package com.audit.tracevault.core.service;
 import java.time.Instant;
 import java.util.UUID;
 
-import com.audit.tracevault.core.domain.Webhook;
+import com.audit.tracevault.core.domain.AlertRules;
 import com.audit.tracevault.core.exception.ResourceNotFoundException;
 import com.audit.tracevault.core.ports.in.PageResult;
-import com.audit.tracevault.core.ports.in.WebhookInputQuery;
-import com.audit.tracevault.core.ports.in.WebhookUseCase;
-import com.audit.tracevault.core.ports.out.WebhookRepositoryPort;
+import com.audit.tracevault.core.ports.in.AlertRulesInputQuery;
+import com.audit.tracevault.core.ports.in.AlertRulesUseCase;
+import com.audit.tracevault.core.ports.out.AlertRulesRepositoryPort;
 
-public class WebhookService implements WebhookUseCase {
-    private final WebhookRepositoryPort webhookRepositoryPort;
+public class AlertRulesService implements AlertRulesUseCase {
+    private final AlertRulesRepositoryPort webhookRepositoryPort;
     
-    public WebhookService(WebhookRepositoryPort webhookRepositoryPort) {
+    public AlertRulesService(AlertRulesRepositoryPort webhookRepositoryPort) {
         this.webhookRepositoryPort = webhookRepositoryPort;
     }
 
     @Override
-    public Webhook create(Webhook webhook) {
+    public AlertRules create(AlertRules webhook) {
         webhook.setCreatedAt(Instant.now());
         webhook.setUpdatedAt(Instant.now());
         webhook.setIsActive(true);
@@ -27,22 +27,24 @@ public class WebhookService implements WebhookUseCase {
     }
 
     @Override
-    public PageResult<Webhook> findAll(WebhookInputQuery queryInput) {
+    public PageResult<AlertRules> findAll(AlertRulesInputQuery queryInput) {
         return webhookRepositoryPort.findAll(queryInput);
     }
 
     @Override
-    public Webhook findById(UUID id) {
+    public AlertRules findById(UUID id) {
         return webhookRepositoryPort.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Webhook not found with id: " + id));
     }
 
     @Override
-    public Webhook update(UUID id, Webhook webhook) {
-        Webhook existingWebhook = webhookRepositoryPort.findById(id)
+    public AlertRules update(UUID id, AlertRules webhook) {
+        AlertRules existingWebhook = webhookRepositoryPort.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Webhook not found with id: " + id));
 
-        existingWebhook.setEndpointUrl(webhook.getEndpointUrl());
+        existingWebhook.setChannelConfig(webhook.getChannelConfig());
+        existingWebhook.setChannelType(webhook.getChannelType());
+        existingWebhook.setMessageTemplate(webhook.getMessageTemplate());
         existingWebhook.setTriggerEvents(webhook.getTriggerEvents());
         existingWebhook.setMinSeverity(webhook.getMinSeverity());
         existingWebhook.setIsActive(webhook.getIsActive());

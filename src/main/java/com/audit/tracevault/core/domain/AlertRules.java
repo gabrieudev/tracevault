@@ -1,14 +1,17 @@
 package com.audit.tracevault.core.domain;
 
 import java.time.Instant;
+import java.util.Map;
 import java.util.UUID;
 
-public class Webhook {
+public class AlertRules {
     private UUID id;
     private Application application;
-    private String endpointUrl;
     private String[] triggerEvents;
     private SeverityEnum minSeverity;
+    private ChannelTypeEnum channelType;
+    private Map<String, Object> channelConfig;
+    private String messageTemplate;
     private Boolean isActive;
     private Instant createdAt;
     private Instant updatedAt;
@@ -27,14 +30,6 @@ public class Webhook {
 
     public void setApplication(Application application) {
         this.application = application;
-    }
-
-    public String getEndpointUrl() {
-        return endpointUrl;
-    }
-
-    public void setEndpointUrl(String endpointUrl) {
-        this.endpointUrl = endpointUrl;
     }
 
     public String[] getTriggerEvents() {
@@ -77,18 +72,45 @@ public class Webhook {
         this.updatedAt = updatedAt;
     }
 
-    public Webhook(UUID id, Application application, String endpointUrl, String[] triggerEvents,
-            SeverityEnum minSeverity, Boolean isActive, Instant createdAt, Instant updatedAt) {
+    public ChannelTypeEnum getChannelType() {
+        return channelType;
+    }
+
+    public void setChannelType(ChannelTypeEnum channelType) {
+        this.channelType = channelType;
+    }
+
+    public Map<String, Object> getChannelConfig() {
+        return channelConfig;
+    }
+
+    public void setChannelConfig(Map<String, Object> channelConfig) {
+        this.channelConfig = channelConfig;
+    }
+
+    public String getMessageTemplate() {
+        return messageTemplate;
+    }
+
+    public void setMessageTemplate(String messageTemplate) {
+        this.messageTemplate = messageTemplate;
+    }
+
+    public AlertRules(UUID id, Application application, String[] triggerEvents,
+                   SeverityEnum minSeverity, ChannelTypeEnum channelType, Map<String, Object> channelConfig,
+                   String messageTemplate, Boolean isActive, Instant createdAt, Instant updatedAt) {
         this.id = id;
         this.application = application;
-        this.endpointUrl = endpointUrl;
         this.triggerEvents = triggerEvents;
         this.minSeverity = minSeverity;
+        this.channelType = channelType;
+        this.channelConfig = channelConfig;
+        this.messageTemplate = messageTemplate;
         this.isActive = isActive;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
     }
 
-    public Webhook() {
+    public AlertRules() {
     }
 }

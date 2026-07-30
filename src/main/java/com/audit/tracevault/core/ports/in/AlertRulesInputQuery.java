@@ -3,11 +3,14 @@ package com.audit.tracevault.core.ports.in;
 import java.time.Instant;
 import java.util.UUID;
 
-public record WebhookInputQuery(
+import com.audit.tracevault.core.domain.ChannelTypeEnum;
+
+public record AlertRulesInputQuery(
         UUID id,
         String search,
         UUID applicationId,
-        String endpointUrl,
+        String messageTemplate,
+        ChannelTypeEnum channelType,
         String[] triggerEvents,
         String minSeverity,
         Boolean isActive,

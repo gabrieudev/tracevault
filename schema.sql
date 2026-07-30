@@ -2,6 +2,7 @@ CREATE EXTENSION IF NOT EXISTS pgcrypto;
 
 CREATE TYPE application_status AS ENUM ('ACTIVE', 'INACTIVE');
 CREATE TYPE audit_severity AS ENUM ('INFO', 'WARNING', 'CRITICAL');
+CREATE TYPE channel_type AS ENUM ('EMAIL', 'SLACK', 'DISCORD', 'WEBHOOK');
 
 CREATE OR REPLACE FUNCTION touch_updated_at()
 RETURNS trigger
@@ -93,37 +94,40 @@ CREATE INDEX idx_audit_log_occurred_at_brin
 CREATE INDEX idx_audit_log_metadata_gin
     ON audit_log USING gin (metadata jsonb_path_ops);
 
-CREATE TABLE webhook (
-    id              uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-    application_id  uuid NOT NULL,
-    endpoint_url    text NOT NULL,
-    trigger_events  text[] NOT NULL,
-    min_severity    audit_severity NOT NULL DEFAULT 'CRITICAL',
-    is_active       boolean NOT NULL DEFAULT true,
-    created_at      timestamptz NOT NULL DEFAULT now(),
-    updated_at      timestamptz NOT NULL DEFAULT now(),
+CREATE TABLE alert_rules (
+    id               uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+    application_id   uuid NOT NULL,
+    endpoint_url     text NOT NULL,
+    trigger_events   text[] NOT NULL,
+    min_severity     audit_severity NOT NULL DEFAULT 'CRITICAL',
+    channel_type     channel_type NOT NULL DEFAULT 'WEBHOOK',
+    channel_config   jsonb NOT NULL DEFAULT '{}'::jsonb,
+    message_template text,
+    is_active        boolean NOT NULL DEFAULT true,
+    created_at       timestamptz NOT NULL DEFAULT now(),
+    updated_at       timestamptz NOT NULL DEFAULT now(),
 
-    CONSTRAINT fk_webhook_application
+    CONSTRAINT fk_alert_rules_application
         FOREIGN KEY (application_id)
         REFERENCES application (id)
         ON DELETE CASCADE,
 
-    CONSTRAINT uq_webhook_app_endpoint UNIQUE (application_id, endpoint_url)
+    CONSTRAINT uq_alert_rules_app_endpoint UNIQUE (application_id, endpoint_url)
 );
 
-CREATE TRIGGER trg_webhook_touch_updated_at
-BEFORE UPDATE ON webhook
+CREATE TRIGGER trg_alert_rules_touch_updated_at
+BEFORE UPDATE ON alert_rules
 FOR EACH ROW
 EXECUTE FUNCTION touch_updated_at();
 
-CREATE INDEX idx_webhook_app_active
-    ON webhook (application_id, is_active);
+CREATE INDEX idx_alert_rules_app_active
+    ON alert_rules (application_id, is_active);
 
-CREATE INDEX idx_webhook_trigger_events_gin
-    ON webhook USING gin (trigger_events);
+CREATE INDEX idx_alert_rules_trigger_events_gin
+    ON alert_rules USING gin (trigger_events);
 
-CREATE INDEX idx_webhook_active_only
-    ON webhook (application_id)
+CREATE INDEX idx_alert_rules_active_only
+    ON alert_rules (application_id)
     WHERE is_active = true;
 
 REVOKE UPDATE, DELETE, TRUNCATE ON audit_log FROM PUBLIC;
