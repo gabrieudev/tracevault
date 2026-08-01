@@ -7,7 +7,7 @@ import java.util.UUID;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 
-import com.audit.tracevault.core.domain.AuditLogActionEnum;
+import com.audit.tracevault.core.domain.ActionEnum;
 import com.audit.tracevault.core.domain.SeverityEnum;
 
 import jakarta.persistence.Column;
@@ -50,7 +50,7 @@ public class AuditLogEntity {
     
     @Column(name = "action", nullable = false)
     @JdbcTypeCode(SqlTypes.NAMED_ENUM)
-    private AuditLogActionEnum action;
+    private ActionEnum action;
     
     @Column(name = "resource_type", nullable = false)
     private String resourceType;

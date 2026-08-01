@@ -1,5 +1,6 @@
 package com.audit.tracevault.infrastructure.adapters.out.persistence;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -10,83 +11,99 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
 
 import com.audit.tracevault.core.domain.AlertRules;
+import com.audit.tracevault.core.domain.Application;
+import com.audit.tracevault.core.ports.in.AlertRulesInputQuery;
 import com.audit.tracevault.core.ports.in.PageResult;
 import com.audit.tracevault.core.ports.in.SortDirection;
-import com.audit.tracevault.core.ports.in.AlertRulesInputQuery;
-import com.audit.tracevault.core.ports.out.AlertRulesRepositoryPort;
+import com.audit.tracevault.core.ports.out.AlertRulesPort;
 import com.audit.tracevault.infrastructure.adapters.out.persistence.entity.AlertRulesEntity;
 import com.audit.tracevault.infrastructure.adapters.out.persistence.mapper.AlertRulesPersistenceMapper;
+import com.audit.tracevault.infrastructure.adapters.out.persistence.mapper.ApplicationPersistenceMapper;
 import com.audit.tracevault.infrastructure.adapters.out.persistence.repository.SpringDataAlertRulesRepository;
 import com.audit.tracevault.infrastructure.adapters.out.persistence.specification.AlertRulesSpecification;
 
 @Component
-public class AlertRulesPersistenceAdapter implements AlertRulesRepositoryPort {
-    private final SpringDataAlertRulesRepository springDataWebhookRepository;
-    private final AlertRulesPersistenceMapper webhookPersistenceMapper;
+public class AlertRulesPersistenceAdapter implements AlertRulesPort {
+        private final SpringDataAlertRulesRepository springDataWebhookRepository;
+        private final AlertRulesPersistenceMapper webhookPersistenceMapper;
+        private final ApplicationPersistenceMapper applicationPersistenceMapper;
 
-    public AlertRulesPersistenceAdapter(SpringDataAlertRulesRepository springDataWebhookRepository,
-            AlertRulesPersistenceMapper webhookPersistenceMapper) {
-        this.springDataWebhookRepository = springDataWebhookRepository;
-        this.webhookPersistenceMapper = webhookPersistenceMapper;
-    }
+        public AlertRulesPersistenceAdapter(SpringDataAlertRulesRepository springDataWebhookRepository,
+                        AlertRulesPersistenceMapper webhookPersistenceMapper,
+                        ApplicationPersistenceMapper applicationPersistenceMapper) {
+                this.springDataWebhookRepository = springDataWebhookRepository;
+                this.webhookPersistenceMapper = webhookPersistenceMapper;
+                this.applicationPersistenceMapper = applicationPersistenceMapper;
+        }
 
-    @Override
-    public PageResult<AlertRules> findAll(AlertRulesInputQuery queryInput) {
-        boolean isPaged = queryInput.page() != null && queryInput.size() != null;
+        @Override
+        public PageResult<AlertRules> findAll(AlertRulesInputQuery queryInput) {
+                boolean isPaged = queryInput.page() != null && queryInput.size() != null;
 
-        String sortBy = Optional.ofNullable(queryInput.sortBy())
-                .filter(s -> !s.isBlank())
-                .orElse("createdAt");
+                String sortBy = Optional.ofNullable(queryInput.sortBy())
+                                .filter(s -> !s.isBlank())
+                                .orElse("createdAt");
 
-        SortDirection direction = Optional.ofNullable(queryInput.sortDirection())
-                .orElse(SortDirection.DESC);
+                SortDirection direction = Optional.ofNullable(queryInput.sortDirection())
+                                .orElse(SortDirection.DESC);
 
-        Sort sort = Sort.by(sortBy);
+                Sort sort = Sort.by(sortBy);
 
-        sort = direction == SortDirection.ASC
-                ? sort.ascending()
-                : sort.descending();
+                sort = direction == SortDirection.ASC
+                                ? sort.ascending()
+                                : sort.descending();
 
-        Pageable pageable = isPaged
-                ? PageRequest.of(queryInput.page(), queryInput.size(), sort)
-                : Pageable.unpaged(sort);
+                Pageable pageable = isPaged
+                                ? PageRequest.of(queryInput.page(), queryInput.size(), sort)
+                                : Pageable.unpaged(sort);
 
-        var spec = AlertRulesSpecification.hasId(queryInput.id())
-                .and(AlertRulesSpecification.search(queryInput.search()))
-                .and(AlertRulesSpecification.hasApplicationId(queryInput.applicationId()))
-                .and(AlertRulesSpecification.hasMessageTemplate(queryInput.messageTemplate()))
-                .and(AlertRulesSpecification.hasChannelType(queryInput.channelType()))
-                .and(AlertRulesSpecification.hasTriggerEvents(queryInput.triggerEvents()))
-                .and(AlertRulesSpecification.hasMinSeverity(queryInput.minSeverity()))
-                .and(AlertRulesSpecification.hasIsActive(queryInput.isActive()))
-                .and(AlertRulesSpecification.createdFrom(queryInput.createdFrom()))
-                .and(AlertRulesSpecification.createdTo(queryInput.createdTo()))
-                .and(AlertRulesSpecification.updatedFrom(queryInput.updatedFrom()))
-                .and(AlertRulesSpecification.updatedTo(queryInput.updatedTo()));
+                var spec = AlertRulesSpecification.hasId(queryInput.id())
+                                .and(AlertRulesSpecification.search(queryInput.search()))
+                                .and(AlertRulesSpecification.hasApplicationId(queryInput.applicationId()))
+                                .and(AlertRulesSpecification.hasMessageTemplate(queryInput.messageTemplate()))
+                                .and(AlertRulesSpecification.hasChannelType(queryInput.channelType()))
+                                .and(AlertRulesSpecification.hasTriggerEvents(queryInput.triggerEvents()))
+                                .and(AlertRulesSpecification.hasMinSeverity(queryInput.minSeverity()))
+                                .and(AlertRulesSpecification.hasIsActive(queryInput.isActive()))
+                                .and(AlertRulesSpecification.createdFrom(queryInput.createdFrom()))
+                                .and(AlertRulesSpecification.createdTo(queryInput.createdTo()))
+                                .and(AlertRulesSpecification.updatedFrom(queryInput.updatedFrom()))
+                                .and(AlertRulesSpecification.updatedTo(queryInput.updatedTo()));
 
-        Page<AlertRulesEntity> page = springDataWebhookRepository.findAll(spec, pageable);
+                Page<AlertRulesEntity> page = springDataWebhookRepository.findAll(spec, pageable);
 
-        return new PageResult<>(
-                page.getContent().stream()
-                        .map(webhookPersistenceMapper::toDomain)
-                        .toList(),
-                page.getNumber(),
-                page.getSize(),
-                page.getTotalElements(),
-                page.getTotalPages(),
-                page.isFirst(),
-                page.isLast());
-    }
+                return new PageResult<>(
+                                page.getContent().stream()
+                                                .map(webhookPersistenceMapper::toDomain)
+                                                .toList(),
+                                page.getNumber(),
+                                page.getSize(),
+                                page.getTotalElements(),
+                                page.getTotalPages(),
+                                page.isFirst(),
+                                page.isLast());
+        }
 
-    @Override
-    public Optional<AlertRules> findById(UUID id) {
-        return springDataWebhookRepository.findById(id).map(webhookPersistenceMapper::toDomain);
-    }
+        @Override
+        public Optional<AlertRules> findById(UUID id) {
+                return springDataWebhookRepository.findById(id).map(webhookPersistenceMapper::toDomain);
+        }
 
-    @Override
-    public AlertRules save(AlertRules webhook) {
-        AlertRulesEntity webhookEntity = webhookPersistenceMapper.toEntity(webhook);
-        AlertRulesEntity savedEntity = springDataWebhookRepository.save(webhookEntity);
-        return webhookPersistenceMapper.toDomain(savedEntity);
-    }
+        @Override
+        public AlertRules save(AlertRules webhook) {
+                AlertRulesEntity webhookEntity = webhookPersistenceMapper.toEntity(webhook);
+                AlertRulesEntity savedEntity = springDataWebhookRepository.save(webhookEntity);
+                return webhookPersistenceMapper.toDomain(savedEntity);
+        }
+
+        @Override
+        public List<AlertRules> findActiveByApplication(Application application) {
+                List<AlertRulesEntity> activeAlertRulesEntities = springDataWebhookRepository
+                                .findByIsActiveAndApplication(true,
+                                                applicationPersistenceMapper.toEntity(application));
+                return activeAlertRulesEntities.stream()
+                                .map(webhookPersistenceMapper::toDomain)
+                                .toList();
+        }
+
 }

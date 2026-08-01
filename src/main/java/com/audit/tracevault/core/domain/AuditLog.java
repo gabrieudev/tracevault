@@ -11,7 +11,7 @@ public class AuditLog {
     private String actorName;
     private String actorIp;
     private String actorUserAgent;
-    private AuditLogActionEnum action;
+    private ActionEnum action;
     private String resourceType;
     private String resourceId;
     private Map<String, Object> oldValues;
@@ -69,11 +69,11 @@ public class AuditLog {
         this.actorUserAgent = actorUserAgent;
     }
 
-    public AuditLogActionEnum getAction() {
+    public ActionEnum getAction() {
         return action;
     }
 
-    public void setAction(AuditLogActionEnum action) {
+    public void setAction(ActionEnum action) {
         this.action = action;
     }
 
@@ -142,7 +142,7 @@ public class AuditLog {
     }
 
     public AuditLog(UUID id, Application application, String actorId, String actorName, String actorIp,
-            String actorUserAgent, AuditLogActionEnum action, String resourceType, String resourceId,
+            String actorUserAgent, ActionEnum action, String resourceType, String resourceId,
             Map<String, Object> oldValues, Map<String, Object> newValues, Map<String, Object> metadata,
             SeverityEnum severity, Instant occurredAt, Instant createdAt) {
         this.id = id;

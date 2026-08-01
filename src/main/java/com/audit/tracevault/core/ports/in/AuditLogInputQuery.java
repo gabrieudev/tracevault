@@ -3,7 +3,7 @@ package com.audit.tracevault.core.ports.in;
 import java.time.Instant;
 import java.util.UUID;
 
-import com.audit.tracevault.core.domain.AuditLogActionEnum;
+import com.audit.tracevault.core.domain.ActionEnum;
 import com.audit.tracevault.core.domain.SeverityEnum;
 
 public record AuditLogInputQuery(
@@ -14,7 +14,7 @@ public record AuditLogInputQuery(
         String actorName,
         String actorIp,
         String actorUserAgent,
-        AuditLogActionEnum action,
+        ActionEnum action,
         String resourceType,
         String resourceId,
         SeverityEnum severity,

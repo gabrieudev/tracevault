@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import com.audit.tracevault.core.exception.FailedCryptographyException;
 import com.audit.tracevault.core.exception.ResourceNotFoundException;
+import com.audit.tracevault.core.exception.UnsupportedNotificationChannelException;
 import com.audit.tracevault.infrastructure.adapters.in.web.dto.ApiErrorResponse;
 
 @RestControllerAdvice
@@ -20,6 +21,12 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(ResourceNotFoundException.class)
     public ResponseEntity<ApiErrorResponse> handleResourceNotFound(ResourceNotFoundException ex) {
         return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                .body(new ApiErrorResponse(false, ex.getMessage()));
+    }
+
+    @ExceptionHandler(UnsupportedNotificationChannelException.class)
+    public ResponseEntity<ApiErrorResponse> handleUnsupportedNotificationChannel(UnsupportedNotificationChannelException ex) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                 .body(new ApiErrorResponse(false, ex.getMessage()));
     }
 

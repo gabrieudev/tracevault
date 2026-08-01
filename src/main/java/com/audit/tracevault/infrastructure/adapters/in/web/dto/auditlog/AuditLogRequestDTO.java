@@ -5,7 +5,7 @@ import java.util.Map;
 
 import org.hibernate.validator.constraints.IpAddress;
 
-import com.audit.tracevault.core.domain.AuditLogActionEnum;
+import com.audit.tracevault.core.domain.ActionEnum;
 import com.audit.tracevault.core.domain.SeverityEnum;
 import com.audit.tracevault.infrastructure.adapters.in.web.dto.application.ApplicationResponseDTO;
 
@@ -29,7 +29,7 @@ public class AuditLogRequestDTO {
     private String actorIp;
     private String actorUserAgent;
     @NotNull(message = "Action is required")
-    private AuditLogActionEnum action;
+    private ActionEnum action;
     @NotNull(message = "Resource type is required")
     @NotBlank(message = "Resource type cannot be blank")
     private String resourceType;

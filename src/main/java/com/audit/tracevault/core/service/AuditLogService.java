@@ -9,21 +9,24 @@ import com.audit.tracevault.core.exception.ResourceNotFoundException;
 import com.audit.tracevault.core.ports.in.AuditLogInputQuery;
 import com.audit.tracevault.core.ports.in.AuditLogUseCase;
 import com.audit.tracevault.core.ports.in.PageResult;
-import com.audit.tracevault.core.ports.out.ApiKeyCryptographyRepositoryPort;
+import com.audit.tracevault.core.ports.out.ApiKeyCryptographyPort;
 import com.audit.tracevault.core.ports.out.ApplicationRepositoryPort;
+import com.audit.tracevault.core.ports.out.AuditLogEventPublisher;
 import com.audit.tracevault.core.ports.out.AuditLogRepositoryPort;
 
 public class AuditLogService implements AuditLogUseCase {
     private final AuditLogRepositoryPort auditLogRepositoryPort;
     private final ApplicationRepositoryPort applicationRepositoryPort;
-    private final ApiKeyCryptographyRepositoryPort apiKeyCryptographyRepositoryPort;
+    private final ApiKeyCryptographyPort apiKeyCryptographyRepositoryPort;
+    private final AuditLogEventPublisher publisher;
 
     public AuditLogService(AuditLogRepositoryPort auditLogRepositoryPort,
             ApplicationRepositoryPort applicationRepositoryPort,
-            ApiKeyCryptographyRepositoryPort apiKeyCryptographyRepositoryPort) {
+            ApiKeyCryptographyPort apiKeyCryptographyRepositoryPort, AuditLogEventPublisher publisher) {
         this.auditLogRepositoryPort = auditLogRepositoryPort;
         this.applicationRepositoryPort = applicationRepositoryPort;
         this.apiKeyCryptographyRepositoryPort = apiKeyCryptographyRepositoryPort;
+        this.publisher = publisher;
     }
 
     @Override
@@ -39,7 +42,11 @@ public class AuditLogService implements AuditLogUseCase {
 
         auditLog.setCreatedAt(Instant.now());
 
-        return auditLogRepositoryPort.save(auditLog);
+        AuditLog savedAuditLog = auditLogRepositoryPort.save(auditLog);
+
+        publisher.publish(savedAuditLog);
+
+        return savedAuditLog;
     }
 
     @Override

@@ -31,157 +31,158 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 
-@Tag(name = "Webhooks", description = """
-        Endpoints responsible for managing webhook integrations. Webhooks allow external systems to receive real-time notifications whenever configured audit events occur. Each webhook belongs to an application and can be configured to listen for specific event types and severity levels.
-        """)
+@Tag(name = "Alert Rules", description = """
+                Endpoints responsible for managing alert rules. Alert rules allow you to define conditions under which alerts are triggered. Each alert rule belongs to an application and can be configured to listen for specific event types and severity levels.
+                """)
 @RestController
-@RequestMapping("/webhooks")
+@RequestMapping("/alert-rules")
 public class AlertRulesController {
 
-    private final AlertRulesUseCase webhookUseCase;
-    private final AlertRulesWebMapper webhookWebMapper;
+        private final AlertRulesUseCase alertRuleUseCase;
+        private final AlertRulesWebMapper alertRulesWebMapper;
 
-    public AlertRulesController(
-            AlertRulesUseCase webhookUseCase,
-            AlertRulesWebMapper webhookWebMapper) {
+        public AlertRulesController(
+                        AlertRulesUseCase alertRuleUseCase,
+                        AlertRulesWebMapper alertRulesWebMapper) {
 
-        this.webhookUseCase = webhookUseCase;
-        this.webhookWebMapper = webhookWebMapper;
-    }
+                this.alertRuleUseCase = alertRuleUseCase;
+                this.alertRulesWebMapper = alertRulesWebMapper;
+        }
 
-    @Operation(summary = "Create webhook", description = """
-            Creates a new webhook subscription.
+        @Operation(summary = "Create alert rule", description = """
+                        Creates a new alert rule.
 
-            Once created, the webhook will receive HTTP requests
-            whenever matching audit events occur.
-            """)
-    @ApiResponses({
-            @ApiResponse(responseCode = "201", description = "Webhook created successfully"),
-            @ApiResponse(responseCode = "400", description = "Invalid request", content = @Content),
-            @ApiResponse(responseCode = "404", description = "Application not found", content = @Content),
-            @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content)
-    })
-    @PostMapping
-    public ResponseEntity<AlertRulesResponseDTO> create(
+                        Once created, the alert rule will trigger alerts
+                        whenever matching audit events occur.
+                        """)
+        @ApiResponses({
+                        @ApiResponse(responseCode = "201", description = "Alert rule created successfully"),
+                        @ApiResponse(responseCode = "400", description = "Invalid request", content = @Content),
+                        @ApiResponse(responseCode = "404", description = "Application not found", content = @Content),
+                        @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content)
+        })
+        @PostMapping
+        public ResponseEntity<AlertRulesResponseDTO> create(
 
-            @io.swagger.v3.oas.annotations.parameters.RequestBody(required = true, description = """
-                    Webhook configuration.
+                        @io.swagger.v3.oas.annotations.parameters.RequestBody(required = true, description = """
+                                        Alert rule configuration.
 
-                    Contains the destination URL, subscribed events,
-                    severity filters and activation status.
-                    """) @RequestBody @Valid AlertRulesRequestDTO webhookRequestDTO) {
+                                        Contains the message template, channel type,
+                                        trigger events, channel configuration,
+                                        severity filters and activation status.
+                                        """) @RequestBody @Valid AlertRulesRequestDTO alertRulesRequestDTO) {
 
-        var webhook = webhookWebMapper.toDomain(webhookRequestDTO);
-        var createdWebhook = webhookUseCase.create(webhook);
-        var responseDTO = webhookWebMapper.toResponseDTO(createdWebhook);
+                var alertRule = alertRulesWebMapper.toDomain(alertRulesRequestDTO);
+                var createdAlertRule = alertRuleUseCase.create(alertRule);
+                var responseDTO = alertRulesWebMapper.toResponseDTO(createdAlertRule);
 
-        return ResponseEntity.status(201).body(responseDTO);
-    }
+                return ResponseEntity.status(201).body(responseDTO);
+        }
 
-    @Operation(summary = "Get webhook by ID", description = """
-            Retrieves a webhook using its unique identifier.
-            """)
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Webhook found"),
-            @ApiResponse(responseCode = "404", description = "Webhook not found", content = @Content),
-            @ApiResponse(responseCode = "400", description = "Invalid identifier", content = @Content),
-            @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content)
-    })
-    @GetMapping("/{id}")
-    public ResponseEntity<AlertRulesResponseDTO> getById(
+        @Operation(summary = "Get an alert rule by ID", description = """
+                        Retrieves a alert rule using its unique identifier.
+                        """)
+        @ApiResponses({
+                        @ApiResponse(responseCode = "200", description = "Alert rule found"),
+                        @ApiResponse(responseCode = "404", description = "Alert rule not found", content = @Content),
+                        @ApiResponse(responseCode = "400", description = "Invalid identifier", content = @Content),
+                        @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content)
+        })
+        @GetMapping("/{id}")
+        public ResponseEntity<AlertRulesResponseDTO> getById(
 
-            @Parameter(description = "Webhook UUID.", example = "90eb5651-0a9c-4d52-a1ea-fd7a75606c5e") @PathVariable String id) {
+                        @Parameter(description = "Alert rule UUID.", example = "90eb5651-0a9c-4d52-a1ea-fd7a75606c5e") @PathVariable String id) {
 
-        UUID uuid = id != null ? UUID.fromString(id) : null;
+                UUID uuid = id != null ? UUID.fromString(id) : null;
 
-        var webhook = webhookUseCase.findById(uuid);
-        var responseDTO = webhookWebMapper.toResponseDTO(webhook);
+                var alertRule = alertRuleUseCase.findById(uuid);
+                var responseDTO = alertRulesWebMapper.toResponseDTO(alertRule);
 
-        return ResponseEntity.status(200).body(responseDTO);
-    }
+                return ResponseEntity.status(200).body(responseDTO);
+        }
 
-    @Operation(summary = "Search webhooks", description = """
-            Returns a paginated list of webhooks.
+        @Operation(summary = "Search alert rules", description = """
+                        Returns a paginated list of alert rules.
 
-            All filters are optional and may be combined.
+                        All filters are optional and may be combined.
 
-            Supports pagination and sorting using Spring Data
-            pagination parameters.
-            """)
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Webhooks retrieved successfully"),
-            @ApiResponse(responseCode = "400", description = "Invalid query parameters", content = @Content),
-            @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content)
-    })
-    @GetMapping
-    public ResponseEntity<PageResponse<AlertRulesResponseDTO>> getAll(
+                        Supports pagination and sorting using Spring Data
+                        pagination parameters.
+                        """)
+        @ApiResponses({
+                        @ApiResponse(responseCode = "200", description = "Alert rules retrieved successfully"),
+                        @ApiResponse(responseCode = "400", description = "Invalid query parameters", content = @Content),
+                        @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content)
+        })
+        @GetMapping
+        public ResponseEntity<PageResponse<AlertRulesResponseDTO>> getAll(
 
-            @Parameter(description = "Webhook UUID.", example = "90eb5651-0a9c-4d52-a1ea-fd7a75606c5e", in = ParameterIn.QUERY) @RequestParam(required = false) String id,
+                        @Parameter(description = "Alert rule UUID.", example = "90eb5651-0a9c-4d52-a1ea-fd7a75606c5e", in = ParameterIn.QUERY) @RequestParam(required = false) String id,
 
-            @Parameter(description = "Full-text search.", example = "payment", in = ParameterIn.QUERY) @RequestParam(required = false) String search,
+                        @Parameter(description = "Full-text search.", example = "payment", in = ParameterIn.QUERY) @RequestParam(required = false) String search,
 
-            @Parameter(description = "Application UUID.", example = "9f8de7ea-f483-4c73-86ba-1dcdb07ca5cf", in = ParameterIn.QUERY) @RequestParam(required = false) String applicationId,
+                        @Parameter(description = "Application UUID.", example = "9f8de7ea-f483-4c73-86ba-1dcdb07ca5cf", in = ParameterIn.QUERY) @RequestParam(required = false) String applicationId,
 
-            @Parameter(description = "Webhook message template.", example = "A new user has been created: {username}", in = ParameterIn.QUERY) @RequestParam(required = false) String messageTemplate,
+                        @Parameter(description = "Alert rule message template.", example = "A new user has been created: {username}", in = ParameterIn.QUERY) @RequestParam(required = false) String messageTemplate,
 
-            @Parameter(description = "Webhook channel type.", example = "EMAIL", in = ParameterIn.QUERY) @RequestParam(required = false) ChannelTypeEnum channelType,
+                        @Parameter(description = "Alert rule channel type.", example = "EMAIL", in = ParameterIn.QUERY) @RequestParam(required = false) ChannelTypeEnum channelType,
 
-            @Parameter(description = "Subscribed trigger events.", example = "USER_CREATED", in = ParameterIn.QUERY) @RequestParam(required = false) String[] triggerEvents,
+                        @Parameter(description = "Subscribed trigger events.", example = "USER_CREATED", in = ParameterIn.QUERY) @RequestParam(required = false) String[] triggerEvents,
 
-            @Parameter(description = "Minimum severity level required to trigger notifications.", example = "WARNING", in = ParameterIn.QUERY) @RequestParam(required = false) String minSeverity,
+                        @Parameter(description = "Minimum severity level required to trigger notifications.", example = "WARNING", in = ParameterIn.QUERY) @RequestParam(required = false) String minSeverity,
 
-            @Parameter(description = "Whether the webhook is active.", example = "true", in = ParameterIn.QUERY) @RequestParam(required = false) Boolean isActive,
+                        @Parameter(description = "Whether the alert rule is active.", example = "true", in = ParameterIn.QUERY) @RequestParam(required = false) Boolean isActive,
 
-            @Parameter(description = "Minimum creation timestamp (ISO-8601).", example = "2026-01-01T00:00:00Z", in = ParameterIn.QUERY) @RequestParam(required = false) String createdFrom,
+                        @Parameter(description = "Minimum creation timestamp (ISO-8601).", example = "2026-01-01T00:00:00Z", in = ParameterIn.QUERY) @RequestParam(required = false) String createdFrom,
 
-            @Parameter(description = "Maximum creation timestamp (ISO-8601).", example = "2026-12-31T23:59:59Z", in = ParameterIn.QUERY) @RequestParam(required = false) String createdTo,
+                        @Parameter(description = "Maximum creation timestamp (ISO-8601).", example = "2026-12-31T23:59:59Z", in = ParameterIn.QUERY) @RequestParam(required = false) String createdTo,
 
-            @Parameter(description = "Minimum update timestamp (ISO-8601).", example = "2026-01-01T00:00:00Z", in = ParameterIn.QUERY) @RequestParam(required = false) String updatedFrom,
+                        @Parameter(description = "Minimum update timestamp (ISO-8601).", example = "2026-01-01T00:00:00Z", in = ParameterIn.QUERY) @RequestParam(required = false) String updatedFrom,
 
-            @Parameter(description = "Maximum update timestamp (ISO-8601).", example = "2026-12-31T23:59:59Z", in = ParameterIn.QUERY) @RequestParam(required = false) String updatedTo,
+                        @Parameter(description = "Maximum update timestamp (ISO-8601).", example = "2026-12-31T23:59:59Z", in = ParameterIn.QUERY) @RequestParam(required = false) String updatedTo,
 
-            @Parameter(description = """
-                    Zero-based page index.
+                        @Parameter(description = """
+                                        Zero-based page index.
 
-                    Optional.
-                    """, example = "0", in = ParameterIn.QUERY) @RequestParam(required = false) String page,
+                                        Optional.
+                                        """, example = "0", in = ParameterIn.QUERY) @RequestParam(required = false) String page,
 
-            @Parameter(description = """
-                    Number of records per page.
+                        @Parameter(description = """
+                                        Number of records per page.
 
-                    Optional.
-                    """, example = "20", in = ParameterIn.QUERY) @RequestParam(required = false) String size,
+                                        Optional.
+                                        """, example = "20", in = ParameterIn.QUERY) @RequestParam(required = false) String size,
 
-            @Parameter(description = """
-                    Sorting criteria.
+                        @Parameter(description = """
+                                        Sorting criteria.
 
-                    Format:
-                    property,direction
+                                        Format:
+                                        property,direction
 
-                    Example:
-                    createdAt,desc
-                    """, example = "createdAt,desc", in = ParameterIn.QUERY) @RequestParam(required = false) List<String> sort,
+                                        Example:
+                                        createdAt,desc
+                                        """, example = "createdAt,desc", in = ParameterIn.QUERY) @RequestParam(required = false) List<String> sort,
 
-            @Parameter(hidden = true) Pageable pageable) {
+                        @Parameter(hidden = true) Pageable pageable) {
 
-        AlertRulesInputQuery query = webhookWebMapper.toInput(
-                id != null ? UUID.fromString(id) : null,
-                search,
-                applicationId != null ? UUID.fromString(applicationId) : null,
-                messageTemplate,
-                channelType,
-                triggerEvents,
-                minSeverity,
-                isActive,
-                createdFrom != null ? Instant.parse(createdFrom) : null,
-                createdTo != null ? Instant.parse(createdTo) : null,
-                updatedFrom != null ? Instant.parse(updatedFrom) : null,
-                updatedTo != null ? Instant.parse(updatedTo) : null,
-                pageable.isPaged() ? pageable : Pageable.unpaged());
+                AlertRulesInputQuery query = alertRulesWebMapper.toInput(
+                                id != null ? UUID.fromString(id) : null,
+                                search,
+                                applicationId != null ? UUID.fromString(applicationId) : null,
+                                messageTemplate,
+                                channelType,
+                                triggerEvents,
+                                minSeverity,
+                                isActive,
+                                createdFrom != null ? Instant.parse(createdFrom) : null,
+                                createdTo != null ? Instant.parse(createdTo) : null,
+                                updatedFrom != null ? Instant.parse(updatedFrom) : null,
+                                updatedTo != null ? Instant.parse(updatedTo) : null,
+                                pageable.isPaged() ? pageable : Pageable.unpaged());
 
-        PageResponse<AlertRulesResponseDTO> response = webhookWebMapper.toPageResponse(
-                webhookUseCase.findAll(query));
+                PageResponse<AlertRulesResponseDTO> response = alertRulesWebMapper.toPageResponse(
+                                alertRuleUseCase.findAll(query));
 
-        return ResponseEntity.status(200).body(response);
-    }
+                return ResponseEntity.status(200).body(response);
+        }
 }

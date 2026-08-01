@@ -8,12 +8,12 @@ import com.audit.tracevault.core.exception.ResourceNotFoundException;
 import com.audit.tracevault.core.ports.in.PageResult;
 import com.audit.tracevault.core.ports.in.AlertRulesInputQuery;
 import com.audit.tracevault.core.ports.in.AlertRulesUseCase;
-import com.audit.tracevault.core.ports.out.AlertRulesRepositoryPort;
+import com.audit.tracevault.core.ports.out.AlertRulesPort;
 
 public class AlertRulesService implements AlertRulesUseCase {
-    private final AlertRulesRepositoryPort webhookRepositoryPort;
+    private final AlertRulesPort webhookRepositoryPort;
     
-    public AlertRulesService(AlertRulesRepositoryPort webhookRepositoryPort) {
+    public AlertRulesService(AlertRulesPort webhookRepositoryPort) {
         this.webhookRepositoryPort = webhookRepositoryPort;
     }
 

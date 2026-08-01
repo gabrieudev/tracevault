@@ -3,6 +3,42 @@ CREATE EXTENSION IF NOT EXISTS pgcrypto;
 CREATE TYPE application_status AS ENUM ('ACTIVE', 'INACTIVE');
 CREATE TYPE audit_severity AS ENUM ('INFO', 'WARNING', 'CRITICAL');
 CREATE TYPE channel_type AS ENUM ('EMAIL', 'SLACK', 'DISCORD', 'WEBHOOK');
+CREATE TYPE action AS ENUM (
+    'CREATE',
+    'READ',
+    'UPDATE',
+    'DELETE',
+    'LOGIN',
+    'LOGOUT',
+    'LOGIN_FAILED',
+    'TOKEN_REFRESH',
+    'ACCESS_GRANTED',
+    'ACCESS_DENIED',
+    'API_REQUEST',
+    'API_RESPONSE',
+    'APPLICATION_CREATED',
+    'APPLICATION_UPDATED',
+    'APPLICATION_DELETED',
+    'APPLICATION_ENABLED',
+    'APPLICATION_DISABLED',
+    'API_KEY_GENERATED',
+    'API_KEY_REVOKED',
+    'USER_CREATED',
+    'USER_UPDATED',
+    'USER_DELETED',
+    'USER_ENABLED',
+    'USER_DISABLED',
+    'CONFIG_CREATED',
+    'CONFIG_UPDATED',
+    'CONFIG_DELETED',
+    'EXPORT',
+    'IMPORT',
+    'SERVICE_STARTED',
+    'SERVICE_STOPPED',
+    'SECURITY_ALERT',
+    'SUSPICIOUS_ACTIVITY',
+    'CUSTOM_EVENT'
+);
 
 CREATE OR REPLACE FUNCTION touch_updated_at()
 RETURNS trigger
@@ -50,7 +86,7 @@ CREATE TABLE audit_log (
     actor_name       text,
     actor_ip         text,
     actor_user_agent text,
-    action           text NOT NULL,
+    action           action NOT NULL,
     resource_type    text NOT NULL,
     resource_id      text NOT NULL,
     old_values       jsonb,
@@ -97,7 +133,6 @@ CREATE INDEX idx_audit_log_metadata_gin
 CREATE TABLE alert_rules (
     id               uuid PRIMARY KEY DEFAULT gen_random_uuid(),
     application_id   uuid NOT NULL,
-    endpoint_url     text NOT NULL,
     trigger_events   text[] NOT NULL,
     min_severity     audit_severity NOT NULL DEFAULT 'CRITICAL',
     channel_type     channel_type NOT NULL DEFAULT 'WEBHOOK',
@@ -110,9 +145,7 @@ CREATE TABLE alert_rules (
     CONSTRAINT fk_alert_rules_application
         FOREIGN KEY (application_id)
         REFERENCES application (id)
-        ON DELETE CASCADE,
-
-    CONSTRAINT uq_alert_rules_app_endpoint UNIQUE (application_id, endpoint_url)
+        ON DELETE CASCADE
 );
 
 CREATE TRIGGER trg_alert_rules_touch_updated_at

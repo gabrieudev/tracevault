@@ -4,7 +4,7 @@ import java.time.Instant;
 import java.util.Map;
 import java.util.UUID;
 
-import com.audit.tracevault.core.domain.AuditLogActionEnum;
+import com.audit.tracevault.core.domain.ActionEnum;
 import com.audit.tracevault.core.domain.SeverityEnum;
 import com.audit.tracevault.infrastructure.adapters.in.web.dto.application.ApplicationResponseDTO;
 
@@ -22,7 +22,7 @@ public class AuditLogResponseDTO {
     private String actorName;
     private String actorIp;
     private String actorUserAgent;
-    private AuditLogActionEnum action;
+    private ActionEnum action;
     private String resourceType;
     private String resourceId;
     private Map<String, Object> oldValues;

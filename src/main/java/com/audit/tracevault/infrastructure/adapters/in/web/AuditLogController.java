@@ -9,7 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import com.audit.tracevault.core.domain.AuditLog;
-import com.audit.tracevault.core.domain.AuditLogActionEnum;
+import com.audit.tracevault.core.domain.ActionEnum;
 import com.audit.tracevault.core.domain.SeverityEnum;
 import com.audit.tracevault.core.ports.in.AuditLogInputQuery;
 import com.audit.tracevault.core.ports.in.AuditLogUseCase;
@@ -139,7 +139,7 @@ public class AuditLogController {
 
             @Parameter(description = "Actor User-Agent header.", example = "Mozilla/5.0", in = ParameterIn.QUERY) @RequestParam(required = false) String actorUserAgent,
 
-            @Parameter(description = "Audit action performed.", example = "CREATE", in = ParameterIn.QUERY) @RequestParam(required = false) AuditLogActionEnum action,
+            @Parameter(description = "Audit action performed.", example = "CREATE", in = ParameterIn.QUERY) @RequestParam(required = false) ActionEnum action,
 
             @Parameter(description = "Affected resource type.", example = "USER", in = ParameterIn.QUERY) @RequestParam(required = false) String resourceType,
 

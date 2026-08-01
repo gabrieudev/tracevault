@@ -5,7 +5,7 @@ import java.util.UUID;
 
 import org.springframework.data.jpa.domain.Specification;
 
-import com.audit.tracevault.core.domain.AuditLogActionEnum;
+import com.audit.tracevault.core.domain.ActionEnum;
 import com.audit.tracevault.infrastructure.adapters.out.persistence.entity.AuditLogEntity;
 
 public class AuditLogSpecification {
@@ -72,7 +72,7 @@ public class AuditLogSpecification {
                 : cb.equal(cb.lower(root.get("actorUserAgent")), actorUserAgent.toLowerCase());
     }
 
-    public static Specification<AuditLogEntity> hasAction(AuditLogActionEnum action) {
+    public static Specification<AuditLogEntity> hasAction(ActionEnum action) {
         return (root, query, cb) -> action == null
                 ? cb.conjunction()
                 : cb.equal(root.get("action"), action);

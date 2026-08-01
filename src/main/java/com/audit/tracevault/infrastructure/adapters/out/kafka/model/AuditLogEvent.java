@@ -1,9 +1,8 @@
-package com.audit.tracevault.infrastructure.adapters.in.web.dto.auditlog;
+package com.audit.tracevault.infrastructure.adapters.out.kafka.model;
 
 import java.time.Instant;
+import java.util.Map;
 import java.util.UUID;
-
-import org.springframework.data.domain.Pageable;
 
 import com.audit.tracevault.core.domain.ActionEnum;
 import com.audit.tracevault.core.domain.SeverityEnum;
@@ -15,21 +14,17 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class AuditLogInputQueryDTO {
-    private String search;
+public class AuditLogEvent {
     private UUID id;
     private UUID applicationId;
+    private ActionEnum action;
+    private SeverityEnum severity;
     private String actorId;
     private String actorName;
     private String actorIp;
-    private String actorUserAgent;
-    private ActionEnum action;
     private String resourceType;
     private String resourceId;
-    private SeverityEnum severity;
-    private Instant occurredAtFrom;
-    private Instant occurredAtTo;
-    private Instant createdFrom;
-    private Instant createdTo;
-    private Pageable pageable;
+    private Instant occurredAt;
+    private Instant createdAt;
+    private Map<String, Object> metadata;
 }

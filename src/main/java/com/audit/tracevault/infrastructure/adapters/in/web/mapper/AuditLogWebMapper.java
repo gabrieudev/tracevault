@@ -9,7 +9,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 import com.audit.tracevault.core.domain.AuditLog;
-import com.audit.tracevault.core.domain.AuditLogActionEnum;
+import com.audit.tracevault.core.domain.ActionEnum;
 import com.audit.tracevault.core.domain.SeverityEnum;
 import com.audit.tracevault.core.ports.in.AuditLogInputQuery;
 import com.audit.tracevault.core.ports.in.PageResult;
@@ -33,7 +33,7 @@ public interface AuditLogWebMapper {
             String actorName,
             String actorIp,
             String actorUserAgent,
-            AuditLogActionEnum action,
+            ActionEnum action,
             String resourceType,
             String resourceId,
             SeverityEnum severity,

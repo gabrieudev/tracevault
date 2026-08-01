@@ -11,15 +11,15 @@ import com.audit.tracevault.core.ports.in.ApplicationInputQuery;
 import com.audit.tracevault.core.ports.in.ApplicationUseCase;
 import com.audit.tracevault.core.ports.in.CreateApplicationOutput;
 import com.audit.tracevault.core.ports.in.PageResult;
-import com.audit.tracevault.core.ports.out.ApiKeyCryptographyRepositoryPort;
+import com.audit.tracevault.core.ports.out.ApiKeyCryptographyPort;
 import com.audit.tracevault.core.ports.out.ApplicationRepositoryPort;
 
-public class ApplicationDomainService implements ApplicationUseCase {
+public class ApplicationService implements ApplicationUseCase {
     private final ApplicationRepositoryPort applicationRepositoryPort;
-    private final ApiKeyCryptographyRepositoryPort apiKeyCryptographyRepositoryPort;
+    private final ApiKeyCryptographyPort apiKeyCryptographyRepositoryPort;
 
-    public ApplicationDomainService(ApplicationRepositoryPort applicationRepositoryPort,
-            ApiKeyCryptographyRepositoryPort apiKeyCryptographyRepositoryPort) {
+    public ApplicationService(ApplicationRepositoryPort applicationRepositoryPort,
+            ApiKeyCryptographyPort apiKeyCryptographyRepositoryPort) {
         this.applicationRepositoryPort = applicationRepositoryPort;
         this.apiKeyCryptographyRepositoryPort = apiKeyCryptographyRepositoryPort;
     }

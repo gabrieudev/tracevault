@@ -2,12 +2,12 @@ package com.audit.tracevault.core.service;
 
 import com.audit.tracevault.core.exception.FailedCryptographyException;
 import com.audit.tracevault.core.ports.in.ApiKeyCryptographyUseCase;
-import com.audit.tracevault.core.ports.out.ApiKeyCryptographyRepositoryPort;
+import com.audit.tracevault.core.ports.out.ApiKeyCryptographyPort;
 
-public class ApiKeyCryptographyDomainService implements ApiKeyCryptographyUseCase {
-    private final ApiKeyCryptographyRepositoryPort apiKeyCryptographyRepositoryPort;
+public class ApiKeyCryptographyService implements ApiKeyCryptographyUseCase {
+    private final ApiKeyCryptographyPort apiKeyCryptographyRepositoryPort;
 
-    public ApiKeyCryptographyDomainService(ApiKeyCryptographyRepositoryPort apiKeyCryptographyRepositoryPort) {
+    public ApiKeyCryptographyService(ApiKeyCryptographyPort apiKeyCryptographyRepositoryPort) {
         this.apiKeyCryptographyRepositoryPort = apiKeyCryptographyRepositoryPort;
     }
 

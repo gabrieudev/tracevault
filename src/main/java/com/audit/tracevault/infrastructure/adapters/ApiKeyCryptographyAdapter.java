@@ -9,10 +9,10 @@ import java.util.Optional;
 
 import org.springframework.stereotype.Component;
 
-import com.audit.tracevault.core.ports.out.ApiKeyCryptographyRepositoryPort;
+import com.audit.tracevault.core.ports.out.ApiKeyCryptographyPort;
 
 @Component
-public class ApiKeyCryptographyAdapter implements ApiKeyCryptographyRepositoryPort {
+public class ApiKeyCryptographyAdapter implements ApiKeyCryptographyPort {
     private static final int KEY_LENGTH_BYTES = 32;
 
     @Override
