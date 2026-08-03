@@ -13,5 +13,5 @@ public interface ApplicationUseCase {
 
     Application update(UUID id, Application application);
 
-    String rotateKey(UUID id);
+    String rotateKey(UUID applicationId, String apiKey);
 }

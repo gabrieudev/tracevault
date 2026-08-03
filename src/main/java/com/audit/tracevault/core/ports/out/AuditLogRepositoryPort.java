@@ -13,4 +13,6 @@ public interface AuditLogRepositoryPort {
     Optional<AuditLog> findById(UUID id);
 
     PageResult<AuditLog> findAll(AuditLogInputQuery queryInput);
+
+    void saveAll(Iterable<AuditLog> auditLogs);
 }

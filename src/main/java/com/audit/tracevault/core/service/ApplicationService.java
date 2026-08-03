@@ -67,10 +67,14 @@ public class ApplicationService implements ApplicationUseCase {
     }
 
     @Override
-    public String rotateKey(UUID id) {
+    public String rotateKey(UUID id, String apiKey) {
         Application existingApplication = applicationRepositoryPort.findById(id)
                 .orElseThrow(
                         () -> new ResourceNotFoundException("Application not found with id: " + id));
+
+        if (!existingApplication.getApiKeyHash().equals(apiKeyCryptographyRepositoryPort.hashApiKey(apiKey).orElse(null))) {
+            throw new ResourceNotFoundException("Invalid API key for application: " + id);
+        }
 
         String plainKey = apiKeyCryptographyRepositoryPort.generatePlainApiKey("aud")
                 .orElseThrow(() -> new FailedCryptographyException("Failed to generate plain API key"));

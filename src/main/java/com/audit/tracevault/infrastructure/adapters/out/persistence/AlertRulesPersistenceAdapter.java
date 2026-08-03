@@ -9,6 +9,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.audit.tracevault.core.domain.AlertRules;
 import com.audit.tracevault.core.domain.Application;
@@ -37,6 +38,7 @@ public class AlertRulesPersistenceAdapter implements AlertRulesPort {
         }
 
         @Override
+        @Transactional(readOnly = true)
         public PageResult<AlertRules> findAll(AlertRulesInputQuery queryInput) {
                 boolean isPaged = queryInput.page() != null && queryInput.size() != null;
 
@@ -85,11 +87,13 @@ public class AlertRulesPersistenceAdapter implements AlertRulesPort {
         }
 
         @Override
+        @Transactional(readOnly = true)
         public Optional<AlertRules> findById(UUID id) {
                 return springDataWebhookRepository.findById(id).map(webhookPersistenceMapper::toDomain);
         }
 
         @Override
+        @Transactional
         public AlertRules save(AlertRules webhook) {
                 AlertRulesEntity webhookEntity = webhookPersistenceMapper.toEntity(webhook);
                 AlertRulesEntity savedEntity = springDataWebhookRepository.save(webhookEntity);
@@ -97,6 +101,7 @@ public class AlertRulesPersistenceAdapter implements AlertRulesPort {
         }
 
         @Override
+        @Transactional(readOnly = true)
         public List<AlertRules> findActiveByApplication(Application application) {
                 List<AlertRulesEntity> activeAlertRulesEntities = springDataWebhookRepository
                                 .findByIsActiveAndApplication(true,

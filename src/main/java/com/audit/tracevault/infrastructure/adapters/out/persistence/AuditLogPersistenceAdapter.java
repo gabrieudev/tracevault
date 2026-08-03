@@ -8,6 +8,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.audit.tracevault.core.domain.AuditLog;
 import com.audit.tracevault.core.ports.in.AuditLogInputQuery;
@@ -15,6 +16,8 @@ import com.audit.tracevault.core.ports.in.PageResult;
 import com.audit.tracevault.core.ports.in.SortDirection;
 import com.audit.tracevault.core.ports.out.AuditLogRepositoryPort;
 import com.audit.tracevault.infrastructure.adapters.out.persistence.entity.AuditLogEntity;
+import java.util.ArrayList;
+import java.util.List;
 import com.audit.tracevault.infrastructure.adapters.out.persistence.mapper.AuditLogPersistenceMapper;
 import com.audit.tracevault.infrastructure.adapters.out.persistence.repository.SpringDataAuditLogRepository;
 import com.audit.tracevault.infrastructure.adapters.out.persistence.specification.AuditLogSpecification;
@@ -31,6 +34,7 @@ public class AuditLogPersistenceAdapter implements AuditLogRepositoryPort {
         }
 
         @Override
+        @Transactional(readOnly = true)
         public PageResult<AuditLog> findAll(AuditLogInputQuery queryInput) {
                 boolean isPaged = queryInput.page() != null && queryInput.size() != null;
 
@@ -78,15 +82,27 @@ public class AuditLogPersistenceAdapter implements AuditLogRepositoryPort {
         }
 
         @Override
+        @Transactional(readOnly = true)
         public Optional<AuditLog> findById(UUID id) {
                 return auditLogRepository.findById(id)
                                 .map(auditLogPersistenceMapper::toDomain);
         }
 
         @Override
+        @Transactional
         public AuditLog save(AuditLog auditLog) {
                 AuditLogEntity entity = auditLogPersistenceMapper.toEntity(auditLog);
                 AuditLogEntity savedEntity = auditLogRepository.save(entity);
                 return auditLogPersistenceMapper.toDomain(savedEntity);
+        }
+
+        @Override
+        @Transactional
+        public void saveAll(Iterable<AuditLog> auditLogs) {
+                List<AuditLogEntity> entities = new ArrayList<>();
+                for (AuditLog auditLog : auditLogs) {
+                        entities.add(auditLogPersistenceMapper.toEntity(auditLog));
+                }
+                auditLogRepository.saveAll(entities);
         }
 }

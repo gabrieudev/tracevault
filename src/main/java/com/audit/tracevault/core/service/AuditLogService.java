@@ -59,4 +59,25 @@ public class AuditLogService implements AuditLogUseCase {
         return auditLogRepositoryPort.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Audit log not found with id: " + id));
     }
+
+    @Override
+    public void createAll(String headerApiKey, Iterable<AuditLog> auditLogs) {
+        for (AuditLog auditLog : auditLogs) {
+            Application application = applicationRepositoryPort.findById(auditLog.getApplication().getId())
+                    .orElseThrow(() -> new ResourceNotFoundException(
+                            "Application not found with id: " + auditLog.getApplication().getId()));
+            String appHashedKey = application.getApiKeyHash();
+
+            if (!apiKeyCryptographyRepositoryPort.verifyApiKey(headerApiKey, appHashedKey)) {
+                throw new ResourceNotFoundException(
+                        "Invalid API key for application with id: " + application.getId());
+            }
+
+            auditLog.setCreatedAt(Instant.now());
+
+            AuditLog savedAuditLog = auditLogRepositoryPort.save(auditLog);
+
+            publisher.publish(savedAuditLog);
+        }
+    }
 }

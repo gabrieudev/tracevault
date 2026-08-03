@@ -10,4 +10,6 @@ public interface AuditLogUseCase {
     AuditLog findById(UUID id);
 
     AuditLog create(String headerApiKey, AuditLog auditLog);
+
+    void createAll(String headerApiKey, Iterable<AuditLog> auditLogs);
 }

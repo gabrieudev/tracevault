@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -54,7 +55,7 @@ public class ApplicationController {
                 this.applicationUseCase = applicationUseCase;
                 this.applicationWebMapper = applicationWebMapper;
         }
-        
+
         @Operation(summary = "List applications", description = """
                         Returns a paginated list of applications.
 
@@ -198,12 +199,12 @@ public class ApplicationController {
         })
         @PostMapping("/{id}/rotate-key")
         public ResponseEntity<PlainKeyResponseDTO> rotateKey(
-
-                        @Parameter(description = "UUID of the application.", example = "5b3eb0f5-c1d8-44d7-9d8f-6220d52c0d12") @PathVariable String id) {
+                        @Parameter(description = "UUID of the application.", example = "5b3eb0f5-c1d8-44d7-9d8f-6220d52c0d12") @PathVariable String id,
+                        @Parameter(name = "X-API-Key", description = "Application API Key used for authentication.", required = true, example = "tv_live_8N4mVq2P7eQzX...") @RequestHeader("X-API-Key") String apiKey) {
 
                 UUID uuid = id != null ? UUID.fromString(id) : null;
 
-                String newPlainKey = applicationUseCase.rotateKey(uuid);
+                String newPlainKey = applicationUseCase.rotateKey(uuid, apiKey);
 
                 return ResponseEntity
                                 .status(200)

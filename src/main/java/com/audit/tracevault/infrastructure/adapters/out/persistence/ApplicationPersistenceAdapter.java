@@ -8,6 +8,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.audit.tracevault.core.domain.Application;
 import com.audit.tracevault.core.ports.in.ApplicationInputQuery;
@@ -31,6 +32,7 @@ public class ApplicationPersistenceAdapter implements ApplicationRepositoryPort 
         }
 
         @Override
+        @Transactional
         public Application save(Application application) {
                 ApplicationEntity entity = applicationPersistenceMapper.toEntity(application);
                 ApplicationEntity savedEntity = applicationRepositoryPort.save(entity);
@@ -38,6 +40,7 @@ public class ApplicationPersistenceAdapter implements ApplicationRepositoryPort 
         }
 
         @Override
+        @Transactional(readOnly = true)
         public PageResult<Application> findAll(ApplicationInputQuery queryInput) {
                 boolean isPaged = queryInput.page() != null && queryInput.size() != null;
 
@@ -83,12 +86,14 @@ public class ApplicationPersistenceAdapter implements ApplicationRepositoryPort 
         }
 
         @Override
+        @Transactional(readOnly = true)
         public Optional<Application> findById(UUID id) {
                 return applicationRepositoryPort.findById(id)
                                 .map(applicationPersistenceMapper::toDomain);
         }
 
         @Override
+        @Transactional(readOnly = true)
         public Optional<Application> findByApiKeyHash(String apiKeyHash) {
                 return applicationRepositoryPort.findByApiKeyHash(apiKeyHash)
                                 .map(applicationPersistenceMapper::toDomain);
