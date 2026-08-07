@@ -16,7 +16,7 @@ export const primaryNav: NavItem[] = [
 	},
 	{
 		label: "Aplicações",
-		href: "/aplicacoes",
+		href: "/applications",
 		icon: Boxes,
 		description: "Gerenciamento dos tenants que enviam eventos",
 	},

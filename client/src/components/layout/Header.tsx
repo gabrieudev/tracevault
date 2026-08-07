@@ -10,6 +10,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { motion } from "framer-motion";
 import { Bell, LogOut } from "lucide-react";
+import { ModeToggle } from "../ModeToggle";
 
 interface HeaderProps {
 	title: string;
@@ -50,6 +51,8 @@ export function Header({
 			</div>
 
 			<div className="flex items-center gap-2">
+				<ModeToggle />
+
 				<Button variant="ghost" size="icon" className="relative">
 					<Bell className="h-4.5 w-4.5" />
 					{hasUnreadNotifications && <span className="absolute right-1.5 top-1.5 h-1.5 w-1.5 rounded-full bg-destructive" />}
