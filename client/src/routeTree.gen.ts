@@ -13,6 +13,8 @@ import { Route as AppRouteImport } from './routes/_app'
 import { Route as AppIndexRouteImport } from './routes/_app.index'
 import { Route as AppApplicationsIndexRouteImport } from './routes/_app.applications.index'
 import { Route as AppApplicationsIdRouteImport } from './routes/_app.applications.$id'
+import { Route as AppLogsIndexRouteImport } from './routes/_app.logs.index'
+import { Route as AppLogsIdRouteImport } from './routes/_app.logs.$id'
 
 const AppRoute = AppRouteImport.update({
   id: '/_app',
@@ -33,35 +35,58 @@ const AppApplicationsIdRoute = AppApplicationsIdRouteImport.update({
   path: '/applications/$id',
   getParentRoute: () => AppRoute,
 } as any)
+const AppLogsIndexRoute = AppLogsIndexRouteImport.update({
+  id: '/logs/',
+  path: '/logs/',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppLogsIdRoute = AppLogsIdRouteImport.update({
+  id: '/logs/$id',
+  path: '/logs/$id',
+  getParentRoute: () => AppRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof AppIndexRoute
   '/applications/$id': typeof AppApplicationsIdRoute
+  '/logs/$id': typeof AppLogsIdRoute
   '/applications/': typeof AppApplicationsIndexRoute
+  '/logs/': typeof AppLogsIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof AppIndexRoute
   '/applications/$id': typeof AppApplicationsIdRoute
+  '/logs/$id': typeof AppLogsIdRoute
   '/applications': typeof AppApplicationsIndexRoute
+  '/logs': typeof AppLogsIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/_app': typeof AppRouteWithChildren
   '/_app/': typeof AppIndexRoute
   '/_app/applications/$id': typeof AppApplicationsIdRoute
+  '/_app/logs/$id': typeof AppLogsIdRoute
   '/_app/applications/': typeof AppApplicationsIndexRoute
+  '/_app/logs/': typeof AppLogsIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/applications/$id' | '/applications/'
+  fullPaths:
+    | '/'
+    | '/applications/$id'
+    | '/logs/$id'
+    | '/applications/'
+    | '/logs/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/applications/$id' | '/applications'
+  to: '/' | '/applications/$id' | '/logs/$id' | '/applications' | '/logs'
   id:
     | '__root__'
     | '/_app'
     | '/_app/'
     | '/_app/applications/$id'
+    | '/_app/logs/$id'
     | '/_app/applications/'
+    | '/_app/logs/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -98,19 +123,37 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppApplicationsIdRouteImport
       parentRoute: typeof AppRoute
     }
+    '/_app/logs/': {
+      id: '/_app/logs/'
+      path: '/logs'
+      fullPath: '/logs/'
+      preLoaderRoute: typeof AppLogsIndexRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/logs/$id': {
+      id: '/_app/logs/$id'
+      path: '/logs/$id'
+      fullPath: '/logs/$id'
+      preLoaderRoute: typeof AppLogsIdRouteImport
+      parentRoute: typeof AppRoute
+    }
   }
 }
 
 interface AppRouteChildren {
   AppIndexRoute: typeof AppIndexRoute
   AppApplicationsIdRoute: typeof AppApplicationsIdRoute
+  AppLogsIdRoute: typeof AppLogsIdRoute
   AppApplicationsIndexRoute: typeof AppApplicationsIndexRoute
+  AppLogsIndexRoute: typeof AppLogsIndexRoute
 }
 
 const AppRouteChildren: AppRouteChildren = {
   AppIndexRoute: AppIndexRoute,
   AppApplicationsIdRoute: AppApplicationsIdRoute,
+  AppLogsIdRoute: AppLogsIdRoute,
   AppApplicationsIndexRoute: AppApplicationsIndexRoute,
+  AppLogsIndexRoute: AppLogsIndexRoute,
 }
 
 const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren)

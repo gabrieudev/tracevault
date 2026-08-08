@@ -1,8 +1,8 @@
 import { motion } from "framer-motion";
-import { ArrowLeft, Boxes, CalendarDays, Check, Copy, Fingerprint } from "lucide-react";
+import { ArrowLeft, Boxes, CalendarDays, Check, Copy, Fingerprint, Logs } from "lucide-react";
 import { useState } from "react";
 
-import { Link, useParams } from "@tanstack/react-router";
+import { Link, useNavigate, useParams } from "@tanstack/react-router";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -89,6 +89,10 @@ function ApplicationSkeleton() {
 export function ApplicationDetailPage() {
 	const { id } = useParams({
 		from: "/_app/applications/$id",
+	});
+
+	const navigate = useNavigate({
+		from: "/applications/$id",
 	});
 
 	const { data: application, isLoading } = useApplication(id);
@@ -196,6 +200,20 @@ export function ApplicationDetailPage() {
 						{/* Actions */}
 						<div className="flex shrink-0 items-center gap-2">
 							<EditApplicationDialog application={application} />
+
+							<Button
+								onClick={() => {
+									navigate({
+										to: "/logs",
+										search: {
+											applicationId: application.id,
+										},
+									});
+								}}
+								variant="outline"
+							>
+								<Logs /> Logs
+							</Button>
 
 							<RotateKeyDialog applicationId={application.id} />
 						</div>
