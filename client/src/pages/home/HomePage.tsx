@@ -1,11 +1,13 @@
-import { AuditPulse } from "@/components/dashboard/AuditPulse";
-import { SeverityBadge, type Severity } from "@/components/dashboard/SeverityBadge";
-import { StatCard } from "@/components/dashboard/StatCard";
+import { AuditPulse } from "@/pages/home/components/AuditPulse";
+import { StatCard } from "@/pages/home/components/StatCard";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Link } from "@tanstack/react-router";
 import { motion } from "framer-motion";
 import { Activity, ArrowRight, Boxes, KeyRound, ShieldAlert } from "lucide-react";
+import { AnimatedBadge } from "@/components/motion/animated-badge";
+
+export type Severity = "INFO" | "WARNING" | "CRITICAL";
 
 const stats = [
 	{
@@ -157,7 +159,12 @@ export function Home() {
 								className="flex items-center justify-between gap-3 rounded-md px-2 py-2.5 transition-colors hover:bg-muted/50"
 							>
 								<div className="flex min-w-0 items-center gap-3">
-									<SeverityBadge severity={event.severity} />
+									<AnimatedBadge
+										status={event.severity === "CRITICAL" ? "danger" : event.severity === "WARNING" ? "warning" : "info"}
+										size="sm"
+									>
+										{event.severity === "CRITICAL" ? "Crítico" : event.severity === "WARNING" ? "Atenção" : "Informativo"}
+									</AnimatedBadge>
 									<div className="min-w-0">
 										<p className="truncate text-sm text-foreground">
 											<span className="font-mono text-xs text-muted-foreground">{event.action}</span> · {event.resource}

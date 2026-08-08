@@ -1,8 +1,7 @@
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { primaryNav } from "@/config/nav-items";
 import { Link, useLocation } from "@tanstack/react-router";
 import { motion } from "framer-motion";
-import { ScrollText } from "lucide-react";
-import { primaryNav } from "@/config/nav-items";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
 export function Sidebar() {
 	const location = useLocation();
@@ -12,11 +11,11 @@ export function Sidebar() {
 			{/* Logo */}
 			<div className="flex items-center gap-2.5 px-6 py-6">
 				<span className="flex h-8 w-8 items-center justify-center rounded-md bg-sidebar-primary text-sidebar-primary-foreground">
-					<ScrollText className="h-4 w-4" />
+					<img src="/favicon.ico" alt="logo" />
 				</span>
 				<div className="flex flex-col leading-none">
 					<span className="text-sm font-semibold">Audit Trail</span>
-					<span className="font-mono text-[10px] tracking-wide text-muted-foreground">v1 · append-only</span>
+					<span className="font-mono text-[10px] tracking-wide text-muted-foreground">Sistema de Auditoria</span>
 				</div>
 			</div>
 

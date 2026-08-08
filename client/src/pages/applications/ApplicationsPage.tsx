@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import { useNavigate, useSearch } from "@tanstack/react-router";
 
 import { ApplicationsFilterBar } from "./components/ApplicationsFilterBar";
@@ -5,6 +6,8 @@ import { ApplicationsTable } from "./components/ApplicationsTable";
 import { CreateApplicationDialog } from "./components/CreateApplicationDialog";
 import { useApplications } from "./use-applications";
 import type { ApplicationSearch } from "@/routes/_app.applications.index";
+
+const SEARCH_DEBOUNCE_MS = 400;
 
 export function ApplicationsPage() {
 	const { search, status, page } = useSearch({
@@ -15,6 +18,8 @@ export function ApplicationsPage() {
 		from: "/applications/",
 	});
 
+	const [searchInput, setSearchInput] = useState(search ?? "");
+
 	const { data, isLoading } = useApplications({
 		search,
 		status: status && status !== "ALL" ? [status] : undefined,
@@ -22,6 +27,32 @@ export function ApplicationsPage() {
 		size: 10,
 		sort: ["createdAt,desc"],
 	});
+
+	useEffect(() => {
+		setSearchInput(search ?? "");
+	}, [search]);
+
+	useEffect(() => {
+		const normalizedSearch = searchInput.trim();
+
+		if (normalizedSearch === (search ?? "")) {
+			return;
+		}
+
+		const timeout = setTimeout(() => {
+			navigate({
+				search: (prev) => ({
+					...prev,
+					search: normalizedSearch || undefined,
+					page: 0,
+				}),
+			});
+		}, SEARCH_DEBOUNCE_MS);
+
+		return () => {
+			clearTimeout(timeout);
+		};
+	}, [searchInput, search, navigate]);
 
 	function updateSearch(patch: Partial<ApplicationSearch>) {
 		navigate({
@@ -36,14 +67,9 @@ export function ApplicationsPage() {
 		<div className="space-y-5">
 			<div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
 				<ApplicationsFilterBar
-					search={search ?? ""}
+					search={searchInput}
 					status={status ?? "ALL"}
-					onSearchChange={(value) =>
-						updateSearch({
-							search: value || undefined,
-							page: 0,
-						})
-					}
+					onSearchChange={setSearchInput}
 					onStatusChange={(value) =>
 						updateSearch({
 							status: value === "ALL" ? undefined : value,
