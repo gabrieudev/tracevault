@@ -9,6 +9,7 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as SplatRouteImport } from './routes/$'
 import { Route as AppRouteImport } from './routes/_app'
 import { Route as AppIndexRouteImport } from './routes/_app.index'
 import { Route as AppApplicationsIndexRouteImport } from './routes/_app.applications.index'
@@ -16,6 +17,11 @@ import { Route as AppApplicationsIdRouteImport } from './routes/_app.application
 import { Route as AppLogsIndexRouteImport } from './routes/_app.logs.index'
 import { Route as AppLogsIdRouteImport } from './routes/_app.logs.$id'
 
+const SplatRoute = SplatRouteImport.update({
+  id: '/$',
+  path: '/$',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AppRoute = AppRouteImport.update({
   id: '/_app',
   getParentRoute: () => rootRouteImport,
@@ -47,6 +53,7 @@ const AppLogsIdRoute = AppLogsIdRouteImport.update({
 } as any)
 
 export interface FileRoutesByFullPath {
+  '/$': typeof SplatRoute
   '/': typeof AppIndexRoute
   '/applications/$id': typeof AppApplicationsIdRoute
   '/logs/$id': typeof AppLogsIdRoute
@@ -54,6 +61,7 @@ export interface FileRoutesByFullPath {
   '/logs/': typeof AppLogsIndexRoute
 }
 export interface FileRoutesByTo {
+  '/$': typeof SplatRoute
   '/': typeof AppIndexRoute
   '/applications/$id': typeof AppApplicationsIdRoute
   '/logs/$id': typeof AppLogsIdRoute
@@ -62,6 +70,7 @@ export interface FileRoutesByTo {
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
+  '/$': typeof SplatRoute
   '/_app': typeof AppRouteWithChildren
   '/_app/': typeof AppIndexRoute
   '/_app/applications/$id': typeof AppApplicationsIdRoute
@@ -72,15 +81,17 @@ export interface FileRoutesById {
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
+    | '/$'
     | '/'
     | '/applications/$id'
     | '/logs/$id'
     | '/applications/'
     | '/logs/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/applications/$id' | '/logs/$id' | '/applications' | '/logs'
+  to: '/$' | '/' | '/applications/$id' | '/logs/$id' | '/applications' | '/logs'
   id:
     | '__root__'
+    | '/$'
     | '/_app'
     | '/_app/'
     | '/_app/applications/$id'
@@ -90,11 +101,19 @@ export interface FileRouteTypes {
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
+  SplatRoute: typeof SplatRoute
   AppRoute: typeof AppRouteWithChildren
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/$': {
+      id: '/$'
+      path: '/$'
+      fullPath: '/$'
+      preLoaderRoute: typeof SplatRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_app': {
       id: '/_app'
       path: ''
@@ -159,6 +178,7 @@ const AppRouteChildren: AppRouteChildren = {
 const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren)
 
 const rootRouteChildren: RootRouteChildren = {
+  SplatRoute: SplatRoute,
   AppRoute: AppRouteWithChildren,
 }
 export const routeTree = rootRouteImport
