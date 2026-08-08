@@ -4,7 +4,9 @@ import java.time.Instant;
 import java.util.UUID;
 
 import com.audit.tracevault.core.domain.Application;
+import com.audit.tracevault.core.domain.ApplicationStatusEnum;
 import com.audit.tracevault.core.domain.AuditLog;
+import com.audit.tracevault.core.exception.BusinessRuleException;
 import com.audit.tracevault.core.exception.ResourceNotFoundException;
 import com.audit.tracevault.core.ports.in.AuditLogInputQuery;
 import com.audit.tracevault.core.ports.in.AuditLogUseCase;
@@ -40,6 +42,11 @@ public class AuditLogService implements AuditLogUseCase {
             throw new ResourceNotFoundException("Invalid API key for application with id: " + application.getId());
         }
 
+        if (application.getStatus().equals(ApplicationStatusEnum.INACTIVE)) {
+            throw new BusinessRuleException(
+                    "Application with id: " + application.getId() + " is inactive and cannot create audit logs.");
+        }
+
         auditLog.setCreatedAt(Instant.now());
 
         AuditLog savedAuditLog = auditLogRepositoryPort.save(auditLog);
@@ -71,6 +78,11 @@ public class AuditLogService implements AuditLogUseCase {
             if (!apiKeyCryptographyRepositoryPort.verifyApiKey(headerApiKey, appHashedKey)) {
                 throw new ResourceNotFoundException(
                         "Invalid API key for application with id: " + application.getId());
+            }
+
+            if (application.getStatus().equals(ApplicationStatusEnum.INACTIVE)) {
+                throw new BusinessRuleException(
+                        "Application with id: " + application.getId() + " is inactive and cannot create audit logs.");
             }
 
             auditLog.setCreatedAt(Instant.now());

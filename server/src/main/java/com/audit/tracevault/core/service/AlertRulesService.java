@@ -4,52 +4,60 @@ import java.time.Instant;
 import java.util.UUID;
 
 import com.audit.tracevault.core.domain.AlertRules;
+import com.audit.tracevault.core.domain.ApplicationStatusEnum;
+import com.audit.tracevault.core.exception.BusinessRuleException;
 import com.audit.tracevault.core.exception.ResourceNotFoundException;
-import com.audit.tracevault.core.ports.in.PageResult;
 import com.audit.tracevault.core.ports.in.AlertRulesInputQuery;
 import com.audit.tracevault.core.ports.in.AlertRulesUseCase;
+import com.audit.tracevault.core.ports.in.PageResult;
 import com.audit.tracevault.core.ports.out.AlertRulesPort;
 
 public class AlertRulesService implements AlertRulesUseCase {
-    private final AlertRulesPort webhookRepositoryPort;
-    
-    public AlertRulesService(AlertRulesPort webhookRepositoryPort) {
-        this.webhookRepositoryPort = webhookRepositoryPort;
+    private final AlertRulesPort alertRulesRepositoryPort;
+
+    public AlertRulesService(AlertRulesPort alertRulesRepositoryPort) {
+        this.alertRulesRepositoryPort = alertRulesRepositoryPort;
     }
 
     @Override
-    public AlertRules create(AlertRules webhook) {
-        webhook.setCreatedAt(Instant.now());
-        webhook.setUpdatedAt(Instant.now());
-        webhook.setIsActive(true);
+    public AlertRules create(AlertRules alertRules) {
+        if (alertRules.getApplication().getStatus().equals(ApplicationStatusEnum.INACTIVE)) {
+            throw new BusinessRuleException(
+                    "Application with id: " + alertRules.getApplication().getId()
+                            + " is inactive and cannot create alert rules.");
+        }
 
-        return webhookRepositoryPort.save(webhook);
+        alertRules.setCreatedAt(Instant.now());
+        alertRules.setUpdatedAt(Instant.now());
+        alertRules.setIsActive(true);
+
+        return alertRulesRepositoryPort.save(alertRules);
     }
 
     @Override
     public PageResult<AlertRules> findAll(AlertRulesInputQuery queryInput) {
-        return webhookRepositoryPort.findAll(queryInput);
+        return alertRulesRepositoryPort.findAll(queryInput);
     }
 
     @Override
     public AlertRules findById(UUID id) {
-        return webhookRepositoryPort.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Webhook not found with id: " + id));
+        return alertRulesRepositoryPort.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("alertRules not found with id: " + id));
     }
 
     @Override
-    public AlertRules update(UUID id, AlertRules webhook) {
-        AlertRules existingWebhook = webhookRepositoryPort.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Webhook not found with id: " + id));
+    public AlertRules update(UUID id, AlertRules alertRules) {
+        AlertRules existingAlertRules = alertRulesRepositoryPort.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("alertRules not found with id: " + id));
 
-        existingWebhook.setChannelConfig(webhook.getChannelConfig());
-        existingWebhook.setChannelType(webhook.getChannelType());
-        existingWebhook.setMessageTemplate(webhook.getMessageTemplate());
-        existingWebhook.setTriggerEvents(webhook.getTriggerEvents());
-        existingWebhook.setMinSeverity(webhook.getMinSeverity());
-        existingWebhook.setIsActive(webhook.getIsActive());
-        existingWebhook.setUpdatedAt(Instant.now());
+        existingAlertRules.setChannelConfig(alertRules.getChannelConfig());
+        existingAlertRules.setChannelType(alertRules.getChannelType());
+        existingAlertRules.setMessageTemplate(alertRules.getMessageTemplate());
+        existingAlertRules.setTriggerEvents(alertRules.getTriggerEvents());
+        existingAlertRules.setMinSeverity(alertRules.getMinSeverity());
+        existingAlertRules.setIsActive(alertRules.getIsActive());
+        existingAlertRules.setUpdatedAt(Instant.now());
 
-        return webhookRepositoryPort.save(existingWebhook);
+        return alertRulesRepositoryPort.save(existingAlertRules);
     }
 }
