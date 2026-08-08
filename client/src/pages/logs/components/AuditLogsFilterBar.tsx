@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { Search, SlidersHorizontal, X } from "lucide-react";
 import { Input } from "@/components/ui/input";
@@ -7,6 +7,9 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import type { ApplicationResponseDTO } from "@/pages/applications/types";
 import { AUDIT_ACTIONS, type AuditAction } from "../types";
 import type { LogsSearch } from "@/routes/_app.logs.index";
+import { SearchCombobox } from "@/components/SearchCombobox";
+import { DatePicker } from "@/components/DatePicker";
+import { useDebounce } from "@/hooks/use-debounce";
 
 const ACTION_LABELS: Partial<Record<AuditAction, string>> = {
 	CREATE: "Criação",
@@ -61,12 +64,23 @@ export function AuditLogsFilterBar({
 	applications,
 }: AuditLogsFilterBarProps) {
 	const [advancedOpen, setAdvancedOpen] = useState(false);
+	const [actorIdInput, setActorIdInput] = useState(filters.actorId ?? "");
+	const [resourceTypeInput, setResourceTypeInput] = useState(filters.resourceType ?? "");
+
+	const debouncedSearch = useDebounce(searchInput, 500);
+
+	const debouncedActorId = useDebounce(actorIdInput, 500);
+
+	const debouncedResourceType = useDebounce(resourceTypeInput, 500);
 
 	const activeAdvancedCount = [filters.actorId, filters.resourceType, filters.occurredFrom, filters.occurredTo].filter(
 		Boolean,
 	).length;
 
 	function clearAdvanced() {
+		setActorIdInput("");
+		setResourceTypeInput("");
+
 		onFilterChange({
 			actorId: undefined,
 			resourceType: undefined,
@@ -75,52 +89,81 @@ export function AuditLogsFilterBar({
 		});
 	}
 
+	function parseDate(value?: string) {
+		if (!value) return undefined;
+
+		return new Date(value);
+	}
+
+	function formatDate(value?: Date) {
+		if (!value) return undefined;
+
+		return value.toISOString();
+	}
+
+	useEffect(() => {
+		onSearchInputChange(debouncedSearch);
+	}, [debouncedSearch, onSearchInputChange]);
+
+	useEffect(() => {
+		onFilterChange({
+			actorId: debouncedActorId || undefined,
+		});
+	}, [debouncedActorId, onFilterChange]);
+
+	useEffect(() => {
+		onFilterChange({
+			resourceType: debouncedResourceType || undefined,
+		});
+	}, [debouncedResourceType, onFilterChange]);
+
 	return (
 		<div className="space-y-3 rounded-xl border bg-card p-4 shadow-sm">
 			<div className="flex flex-col gap-3 lg:flex-row lg:items-center">
 				<div className="relative flex-1 lg:max-w-sm">
-					<Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-					<Input
-						value={searchInput}
-						onChange={(e) => onSearchInputChange(e.target.value)}
-						placeholder="Buscar em todos os campos indexados..."
-						className="pl-9"
-					/>
+					<Search className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+					<Input placeholder="Buscar..." value={searchInput} onChange={(e) => onSearchInputChange(e.target.value)} />
 				</div>
 
-				<Select
-					value={filters.applicationId ?? "ALL"}
-					onValueChange={(v) => onFilterChange({ applicationId: v === "ALL" ? undefined : v })}
-				>
-					<SelectTrigger className="lg:w-48">
-						<SelectValue placeholder="Aplicação" />
-					</SelectTrigger>
-					<SelectContent>
-						<SelectItem value="ALL">Todas as aplicações</SelectItem>
-						{applications.map((app) => (
-							<SelectItem key={app.id} value={app.id}>
-								{app.name}
-							</SelectItem>
-						))}
-					</SelectContent>
-				</Select>
+				<SearchCombobox
+					className="lg:w-48"
+					value={filters.applicationId}
+					onChange={(value) =>
+						onFilterChange({
+							applicationId: value,
+						})
+					}
+					placeholder="Aplicação"
+					emptyText="Nenhuma aplicação encontrada."
+					options={[
+						{
+							label: "Todas as aplicações",
+							value: "",
+						},
+						...applications.map((app) => ({
+							label: app.name,
+							value: app.id,
+						})),
+					]}
+				/>
 
-				<Select
-					value={filters.action ?? "ALL"}
-					onValueChange={(v) => onFilterChange({ action: v === "ALL" ? undefined : (v as AuditAction) })}
-				>
-					<SelectTrigger className="lg:w-44">
-						<SelectValue placeholder="Ação" />
-					</SelectTrigger>
-					<SelectContent className="max-h-72">
-						<SelectItem value="ALL">Todas as ações</SelectItem>
-						{AUDIT_ACTIONS.map((action) => (
-							<SelectItem key={action} value={action}>
-								{ACTION_LABELS[action] ?? action}
-							</SelectItem>
-						))}
-					</SelectContent>
-				</Select>
+				<SearchCombobox
+					className="lg:w-52"
+					value={filters.action}
+					onChange={(value) =>
+						onFilterChange({
+							action: value as AuditAction | undefined,
+						})
+					}
+					placeholder="Ação"
+					emptyText="Nenhuma ação encontrada."
+					options={[
+						...AUDIT_ACTIONS.map((action) => ({
+							label: ACTION_LABELS[action] ?? action,
+							value: action,
+						})),
+					]}
+				/>
 
 				<Select
 					value={filters.severity ?? "ALL"}
@@ -168,21 +211,15 @@ export function AuditLogsFilterBar({
 								<label htmlFor="actorId" className="text-xs font-medium text-muted-foreground">
 									Ator (ID)
 								</label>
-								<Input
-									key="actorId"
-									value={filters.actorId ?? ""}
-									onChange={(e) => onFilterChange({ actorId: e.target.value || undefined })}
-									placeholder="usr_123 ou e-mail"
-								/>
+								<Input value={actorIdInput} onChange={(e) => setActorIdInput(e.target.value)} placeholder="usr_123 ou e-mail" />
 							</div>
 							<div className="space-y-1.5">
 								<label htmlFor="resourceType" className="text-xs font-medium text-muted-foreground">
 									Tipo de recurso
 								</label>
 								<Input
-									key="resourceType"
-									value={filters.resourceType ?? ""}
-									onChange={(e) => onFilterChange({ resourceType: e.target.value || undefined })}
+									value={resourceTypeInput}
+									onChange={(e) => setResourceTypeInput(e.target.value)}
 									placeholder="Ex: User, Invoice"
 								/>
 							</div>
@@ -190,22 +227,30 @@ export function AuditLogsFilterBar({
 								<label htmlFor="occurredFrom" className="text-xs font-medium text-muted-foreground">
 									Ocorrido de
 								</label>
-								<Input
-									key="occurredFrom"
-									type="datetime-local"
-									value={filters.occurredFrom ?? ""}
-									onChange={(e) => onFilterChange({ occurredFrom: e.target.value || undefined })}
+								<DatePicker
+									className="w-full"
+									value={parseDate(filters.occurredFrom)}
+									onChange={(date) =>
+										onFilterChange({
+											occurredFrom: formatDate(date),
+										})
+									}
+									placeholder="Data inicial"
 								/>
 							</div>
 							<div className="space-y-1.5">
 								<label htmlFor="occurredTo" className="text-xs font-medium text-muted-foreground">
 									Ocorrido até
 								</label>
-								<Input
-									key="occurredTo"
-									type="datetime-local"
-									value={filters.occurredTo ?? ""}
-									onChange={(e) => onFilterChange({ occurredTo: e.target.value || undefined })}
+								<DatePicker
+									className="w-full"
+									value={parseDate(filters.occurredTo)}
+									onChange={(date) =>
+										onFilterChange({
+											occurredTo: formatDate(date),
+										})
+									}
+									placeholder="Data final"
 								/>
 							</div>
 						</div>
