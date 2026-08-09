@@ -2,6 +2,7 @@ import { Outlet, useMatches } from "@tanstack/react-router";
 import { Sidebar } from "./Sidebar";
 import { Header } from "./Header";
 import { MobileNav } from "./MobileNav";
+import { Footer } from "./Footer";
 
 export interface AppRouteStaticData {
 	title?: string;
@@ -24,6 +25,7 @@ export function AppLayout() {
 				<main className="flex-1 px-4 pb-24 pt-4 md:px-8 md:pb-8 md:pt-6">
 					<Outlet />
 				</main>
+				<Footer />
 			</div>
 		</div>
 	);

@@ -22,6 +22,7 @@ export function Sidebar() {
 					damping: 30,
 				}}
 			>
+				{/* Cabeçalho */}
 				<div className={`flex items-center py-6 ${collapsed ? "justify-center px-3" : "gap-2.5 px-6"}`}>
 					<span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md bg-sidebar-primary text-sidebar-primary-foreground">
 						<img src="/favicon.ico" alt="logo" />
@@ -29,13 +30,13 @@ export function Sidebar() {
 
 					{!collapsed && (
 						<motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex flex-col leading-none">
-							<span className="text-sm font-semibold">Audit Trail</span>
-
+							<span className="text-sm font-semibold">TraceVault</span>
 							<span className="font-mono text-[10px] tracking-wide text-muted-foreground">Sistema de Auditoria</span>
 						</motion.div>
 					)}
 				</div>
 
+				{/* Navegação */}
 				<nav className="flex-1 space-y-0.5 px-3 py-2">
 					{primaryNav.map((item) => {
 						const isActive = location.pathname === item.href;
@@ -64,7 +65,7 @@ export function Sidebar() {
 										)}
 
 										<span
-											className="relative z-10 h-3.5 w-0.75 shrink-0 rounded-full"
+											className="relative z-10 h-3.5 w-0.5 shrink-0 rounded-full"
 											style={{
 												backgroundColor: isActive ? "var(--sidebar-primary)" : "transparent",
 											}}
@@ -90,48 +91,30 @@ export function Sidebar() {
 									</Link>
 								</TooltipTrigger>
 
-								{collapsed && (
-									<TooltipContent side="right" className="text-xs">
-										{item.description}
-									</TooltipContent>
-								)}
+								{/* Tooltip sempre disponível, com a descrição do item */}
+								<TooltipContent side="right" className="text-xs">
+									{item.description}
+								</TooltipContent>
 							</Tooltip>
 						);
 					})}
 				</nav>
 
-				<div className="border-t border-sidebar-border px-3 py-4">
-					{!collapsed && (
-						<p className="font-mono text-[10px] leading-relaxed text-muted-foreground">logs imutáveis - sem update/delete</p>
-					)}
-				</div>
-
+				{/* Botão de toggle */}
 				<Tooltip>
 					<TooltipTrigger asChild>
 						<motion.button
 							type="button"
 							onClick={() => setCollapsed((value) => !value)}
-							whileHover={{
-								scale: 1.08,
-							}}
-							whileTap={{
-								scale: 0.95,
-							}}
+							whileHover={{ scale: 1.08 }}
+							whileTap={{ scale: 0.95 }}
 							className="group absolute top-1/2 -right-4 z-50 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full border bg-background text-muted-foreground shadow-md transition-colors hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
 						>
-							<motion.div
-								animate={{
-									rotate: collapsed ? 180 : 0,
-								}}
-								transition={{
-									duration: 0.2,
-								}}
-							>
+							<motion.div animate={{ rotate: collapsed ? 180 : 0 }} transition={{ duration: 0.2 }}>
 								{collapsed ? <PanelLeftOpen className="h-5 w-5" /> : <PanelLeftClose className="h-5 w-5" />}
 							</motion.div>
 						</motion.button>
 					</TooltipTrigger>
-
 					<TooltipContent side="right">{collapsed ? "Expandir menu" : "Recolher menu"}</TooltipContent>
 				</Tooltip>
 			</motion.aside>

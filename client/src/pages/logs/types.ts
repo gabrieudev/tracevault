@@ -1,9 +1,9 @@
 import type { ApplicationResponseDTO } from "@/pages/applications/types";
 
-export type AuditSeverity = "INFO" | "WARNING" | "CRITICAL";
+export type AuditSeverity = "INFO" | "WARNING" | "CRITICAL" | "ALL";
 
-// Enum "action" exatamente como declarado no Swagger (AuditLogRequestDTO/ResponseDTO)
 export const AUDIT_ACTIONS = [
+	"ALL",
 	"CREATE",
 	"READ",
 	"UPDATE",

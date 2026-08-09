@@ -8,10 +8,11 @@ import type { ApplicationResponseDTO } from "@/pages/applications/types";
 import { AUDIT_ACTIONS, type AuditAction } from "../types";
 import type { LogsSearch } from "@/routes/_app.logs.index";
 import { SearchCombobox } from "@/components/SearchCombobox";
-import { DatePicker } from "@/components/DatePicker";
+import { DateTimePicker } from "@/components/DateTimePicker";
 import { useDebounce } from "@/hooks/use-debounce";
 
 const ACTION_LABELS: Partial<Record<AuditAction, string>> = {
+	ALL: "Todas",
 	CREATE: "Criação",
 	READ: "Leitura",
 	UPDATE: "Atualização",
@@ -68,9 +69,7 @@ export function AuditLogsFilterBar({
 	const [resourceTypeInput, setResourceTypeInput] = useState(filters.resourceType ?? "");
 
 	const debouncedSearch = useDebounce(searchInput, 500);
-
 	const debouncedActorId = useDebounce(actorIdInput, 500);
-
 	const debouncedResourceType = useDebounce(resourceTypeInput, 500);
 
 	const activeAdvancedCount = [filters.actorId, filters.resourceType, filters.occurredFrom, filters.occurredTo].filter(
@@ -80,7 +79,6 @@ export function AuditLogsFilterBar({
 	function clearAdvanced() {
 		setActorIdInput("");
 		setResourceTypeInput("");
-
 		onFilterChange({
 			actorId: undefined,
 			resourceType: undefined,
@@ -91,13 +89,11 @@ export function AuditLogsFilterBar({
 
 	function parseDate(value?: string) {
 		if (!value) return undefined;
-
 		return new Date(value);
 	}
 
 	function formatDate(value?: Date) {
 		if (!value) return undefined;
-
 		return value.toISOString();
 	}
 
@@ -118,43 +114,38 @@ export function AuditLogsFilterBar({
 	}, [debouncedResourceType, onFilterChange]);
 
 	return (
-		<div className="space-y-3 rounded-xl border bg-card p-4 shadow-sm">
-			<div className="flex flex-col gap-3 lg:flex-row lg:items-center">
-				<div className="relative flex-1 lg:max-w-sm">
-					<Search className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-					<Input placeholder="Buscar..." value={searchInput} onChange={(e) => onSearchInputChange(e.target.value)} />
+		<div className="rounded-xl border bg-card/60 p-4 shadow-sm backdrop-blur-sm transition-all dark:bg-card/40">
+			{/* Filtros principais */}
+			<div className="flex flex-wrap items-end gap-3">
+				{/* Busca - ocupa o máximo de espaço */}
+				<div className="relative flex-1 min-w-45">
+					<Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+					<Input
+						className="pl-9"
+						placeholder="Buscar por mensagem, IP, usuário..."
+						value={searchInput}
+						onChange={(e) => onSearchInputChange(e.target.value)}
+					/>
 				</div>
 
+				{/* Aplicação */}
 				<SearchCombobox
-					className="lg:w-48"
+					className="min-w-40 flex-1 sm:flex-initial"
 					value={filters.applicationId}
-					onChange={(value) =>
-						onFilterChange({
-							applicationId: value,
-						})
-					}
+					onChange={(value) => onFilterChange({ applicationId: value })}
 					placeholder="Aplicação"
 					emptyText="Nenhuma aplicação encontrada."
 					options={[
-						{
-							label: "Todas as aplicações",
-							value: "",
-						},
-						...applications.map((app) => ({
-							label: app.name,
-							value: app.id,
-						})),
+						{ label: "Todas as aplicações", value: "" },
+						...applications.map((app) => ({ label: app.name, value: app.id })),
 					]}
 				/>
 
+				{/* Ação */}
 				<SearchCombobox
-					className="lg:w-52"
+					className="min-w-40 flex-1 sm:flex-initial"
 					value={filters.action}
-					onChange={(value) =>
-						onFilterChange({
-							action: value as AuditAction | undefined,
-						})
-					}
+					onChange={(value) => onFilterChange({ action: value as AuditAction | undefined })}
 					placeholder="Ação"
 					emptyText="Nenhuma ação encontrada."
 					options={[
@@ -165,11 +156,12 @@ export function AuditLogsFilterBar({
 					]}
 				/>
 
+				{/* Severidade */}
 				<Select
 					value={filters.severity ?? "ALL"}
 					onValueChange={(v) => onFilterChange({ severity: v as LogsSearch["severity"] })}
 				>
-					<SelectTrigger className="lg:w-36">
+					<SelectTrigger className="w-35">
 						<SelectValue placeholder="Severidade" />
 					</SelectTrigger>
 					<SelectContent>
@@ -180,94 +172,107 @@ export function AuditLogsFilterBar({
 					</SelectContent>
 				</Select>
 
+				{/* Botão Mais Filtros */}
 				<Button
 					type="button"
-					variant={advancedOpen || activeAdvancedCount > 0 ? "secondary" : "ghost"}
+					variant={advancedOpen || activeAdvancedCount > 0 ? "secondary" : "outline"}
 					size="sm"
-					className="gap-1.5"
+					className="gap-1.5 h-10 px-3"
 					onClick={() => setAdvancedOpen((v) => !v)}
 				>
-					<SlidersHorizontal className="h-3.5 w-3.5" />
-					Mais filtros
+					<SlidersHorizontal className="h-4 w-4" />
+					<span className="hidden sm:inline">Mais filtros</span>
 					{activeAdvancedCount > 0 && (
-						<span className="ml-0.5 flex h-4 w-4 items-center justify-center rounded-full bg-primary text-[10px] text-primary-foreground">
+						<span className="ml-0.5 flex h-5 w-5 items-center justify-center rounded-full bg-primary text-[10px] font-medium text-primary-foreground">
 							{activeAdvancedCount}
 						</span>
 					)}
 				</Button>
 			</div>
 
+			{/* Filtros avançados (expansível) */}
 			<AnimatePresence initial={false}>
 				{advancedOpen && (
 					<motion.div
-						initial={{ height: 0, opacity: 0 }}
-						animate={{ height: "auto", opacity: 1 }}
-						exit={{ height: 0, opacity: 0 }}
-						transition={{ duration: 0.2, ease: "easeOut" }}
+						initial={{ height: 0, opacity: 0, marginTop: 0 }}
+						animate={{ height: "auto", opacity: 1, marginTop: 16 }}
+						exit={{ height: 0, opacity: 0, marginTop: 0 }}
+						transition={{ duration: 0.25, ease: "easeInOut" }}
 						className="overflow-hidden"
 					>
-						<div className="grid grid-cols-1 gap-3 border-t pt-3 sm:grid-cols-2 lg:grid-cols-4">
-							<div className="space-y-1.5">
-								<label htmlFor="actorId" className="text-xs font-medium text-muted-foreground">
-									Ator (ID)
-								</label>
-								<Input value={actorIdInput} onChange={(e) => setActorIdInput(e.target.value)} placeholder="usr_123 ou e-mail" />
-							</div>
-							<div className="space-y-1.5">
-								<label htmlFor="resourceType" className="text-xs font-medium text-muted-foreground">
-									Tipo de recurso
-								</label>
-								<Input
-									value={resourceTypeInput}
-									onChange={(e) => setResourceTypeInput(e.target.value)}
-									placeholder="Ex: User, Invoice"
-								/>
-							</div>
-							<div className="space-y-1.5">
-								<label htmlFor="occurredFrom" className="text-xs font-medium text-muted-foreground">
-									Ocorrido de
-								</label>
-								<DatePicker
-									className="w-full"
-									value={parseDate(filters.occurredFrom)}
-									onChange={(date) =>
-										onFilterChange({
-											occurredFrom: formatDate(date),
-										})
-									}
-									placeholder="Data inicial"
-								/>
-							</div>
-							<div className="space-y-1.5">
-								<label htmlFor="occurredTo" className="text-xs font-medium text-muted-foreground">
-									Ocorrido até
-								</label>
-								<DatePicker
-									className="w-full"
-									value={parseDate(filters.occurredTo)}
-									onChange={(date) =>
-										onFilterChange({
-											occurredTo: formatDate(date),
-										})
-									}
-									placeholder="Data final"
-								/>
-							</div>
-						</div>
+						<div className="rounded-lg bg-muted/30 p-4 dark:bg-muted/10">
+							<div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+								{/* Ator (ID) */}
+								<div className="space-y-1.5">
+									<label htmlFor="actorId" className="text-xs font-medium text-muted-foreground">
+										Ator (ID ou e-mail)
+									</label>
+									<Input
+										id="actorId"
+										value={actorIdInput}
+										onChange={(e) => setActorIdInput(e.target.value)}
+										placeholder="usr_123 ou exemplo@email.com"
+									/>
+								</div>
 
-						{activeAdvancedCount > 0 && (
-							<div className="mt-3 flex justify-end">
-								<Button
-									type="button"
-									variant="ghost"
-									size="sm"
-									className="gap-1 text-xs text-muted-foreground"
-									onClick={clearAdvanced}
-								>
-									<X className="h-3 w-3" /> Limpar filtros avançados
-								</Button>
+								{/* Tipo de recurso */}
+								<div className="space-y-1.5">
+									<label htmlFor="resourceType" className="text-xs font-medium text-muted-foreground">
+										Tipo de recurso
+									</label>
+									<Input
+										id="resourceType"
+										value={resourceTypeInput}
+										onChange={(e) => setResourceTypeInput(e.target.value)}
+										placeholder="Ex: User, Invoice"
+									/>
+								</div>
+
+								{/* Data inicial */}
+								<div className="space-y-1.5">
+									<label htmlFor="occurredFrom" className="text-xs font-medium text-muted-foreground">
+										Ocorrido de
+									</label>
+									<DateTimePicker
+										key="occurredFrom"
+										className="w-full"
+										value={parseDate(filters.occurredFrom)}
+										onChange={(date) => onFilterChange({ occurredFrom: formatDate(date) })}
+										placeholder="Data inicial"
+									/>
+								</div>
+
+								{/* Data final */}
+								<div className="space-y-1.5">
+									<label htmlFor="occurredTo" className="text-xs font-medium text-muted-foreground">
+										Ocorrido até
+									</label>
+									<DateTimePicker
+										key="occurredTo"
+										className="w-full"
+										value={parseDate(filters.occurredTo)}
+										onChange={(date) => onFilterChange({ occurredTo: formatDate(date) })}
+										placeholder="Data final"
+									/>
+								</div>
 							</div>
-						)}
+
+							{/* Ações do painel avançado */}
+							{activeAdvancedCount > 0 && (
+								<div className="mt-4 flex justify-end border-t border-border/50 pt-3">
+									<Button
+										type="button"
+										variant="ghost"
+										size="sm"
+										className="gap-1.5 text-xs text-muted-foreground hover:text-foreground"
+										onClick={clearAdvanced}
+									>
+										<X className="h-3.5 w-3.5" />
+										Limpar filtros avançados
+									</Button>
+								</div>
+							)}
+						</div>
 					</motion.div>
 				)}
 			</AnimatePresence>

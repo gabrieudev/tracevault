@@ -57,6 +57,8 @@ public class AuditLogPersistenceAdapter implements AuditLogRepositoryPort {
 
                 var spec = AuditLogSpecification.hasId(queryInput.id())
                                 .and(AuditLogSpecification.hasApplicationId(queryInput.applicationId()))
+                                .and(AuditLogSpecification.occurredFrom(queryInput.occurredAtFrom()))
+                                .and(AuditLogSpecification.occurredTo(queryInput.occurredAtTo()))
                                 .and(AuditLogSpecification.hasActorId(queryInput.actorId()))
                                 .and(AuditLogSpecification.hasActorName(queryInput.actorName()))
                                 .and(AuditLogSpecification.hasActorIp(queryInput.actorIp()))
