@@ -107,9 +107,7 @@ export function CreateApplicationDialog() {
 										onChange={(e) => field.handleChange(e.target.value)}
 									/>
 
-									{field.state.meta.errors[0] && (
-										<p className="text-xs text-destructive">{field.state.meta.errors[0].message}</p>
-									)}
+									
 								</div>
 							)}
 						</form.Field>

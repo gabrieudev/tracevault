@@ -19,7 +19,7 @@ public class UpdateAlertRulesDTO {
     @NotNull(message = "Minimum severity cannot be null")
     private SeverityEnum minSeverity;
     @NotNull(message = "Active status cannot be null")
-    private Boolean isActive;
+    private Boolean active;
     @NotNull(message = "Channel type cannot be null")
     private ChannelTypeEnum channelType;
     @NotNull(message = "Channel config cannot be null")

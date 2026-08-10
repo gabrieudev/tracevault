@@ -24,8 +24,9 @@ public class DomainConfig {
     }
 
     @Bean
-    AlertRulesService webhookService(AlertRulesPort webhookRepositoryPort) {
-        return new AlertRulesService(webhookRepositoryPort);
+    AlertRulesService webhookService(AlertRulesPort webhookRepositoryPort,
+            ApplicationRepositoryPort applicationRepositoryPort) {
+        return new AlertRulesService(webhookRepositoryPort, applicationRepositoryPort);
     }
 
     @Bean
@@ -41,7 +42,6 @@ public class DomainConfig {
             ApplicationRepositoryPort applicationRepository) {
         return new ProcessAuditLogService(repository, sender, applicationRepository);
     }
-    
 
     @Bean
     ApiKeyCryptographyService apiKeyCryptographyService(

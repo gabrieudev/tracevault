@@ -19,7 +19,7 @@ public class AlertRulesInputQueryDTO {
     private String endpointUrl;
     private String[] triggerEvents;
     private String minSeverity;
-    private Boolean isActive;
+    private Boolean active;
     private Instant createdFrom;
     private Instant createdTo;
     private Instant updatedFrom;

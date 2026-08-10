@@ -156,7 +156,6 @@ export function ApplicationDetailPage() {
 			transition={{ duration: 0.25, ease: "easeOut" }}
 			className="mx-auto w-full max-w-5xl space-y-6"
 		>
-			{/* Breadcrumb */}
 			<div>
 				<Button asChild variant="ghost" size="sm" className="-ml-2 gap-2 text-muted-foreground hover:text-foreground">
 					<Link
@@ -179,7 +178,7 @@ export function ApplicationDetailPage() {
 				<CardHeader className="space-y-0 p-5 sm:p-6">
 					<div className="flex flex-col gap-5 sm:flex-row sm:items-start sm:justify-between">
 						<div className="flex min-w-0 items-start gap-4">
-							{/* Application icon */}
+							
 							<div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl border border-primary/20 bg-primary/10 text-primary">
 								<Boxes className="h-6 w-6" />
 							</div>
@@ -197,7 +196,6 @@ export function ApplicationDetailPage() {
 							</div>
 						</div>
 
-						{/* Actions */}
 						<div className="flex shrink-0 items-center gap-2">
 							<EditApplicationDialog application={application} />
 
@@ -220,7 +218,6 @@ export function ApplicationDetailPage() {
 					</div>
 				</CardHeader>
 
-				{/* Description */}
 				<CardContent className="space-y-6 px-5 pb-5 sm:px-6 sm:pb-6">
 					<div className="h-px bg-border/60" />
 
@@ -237,7 +234,6 @@ export function ApplicationDetailPage() {
 					</section>
 				</CardContent>
 
-				{/* Metadata */}
 				<div className="border-t border-border/60 bg-muted/10 p-5 sm:p-6">
 					<div className="mb-4">
 						<h3 className="text-sm font-semibold">Informações da aplicação</h3>

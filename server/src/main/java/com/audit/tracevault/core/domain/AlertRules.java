@@ -12,7 +12,7 @@ public class AlertRules {
     private ChannelTypeEnum channelType;
     private Map<String, Object> channelConfig;
     private String messageTemplate;
-    private Boolean isActive;
+    private Boolean active;
     private Instant createdAt;
     private Instant updatedAt;
 
@@ -48,12 +48,12 @@ public class AlertRules {
         this.minSeverity = minSeverity;
     }
 
-    public Boolean getIsActive() {
-        return isActive;
+    public Boolean getActive() {
+        return active;
     }
 
-    public void setIsActive(Boolean isActive) {
-        this.isActive = isActive;
+    public void setActive(Boolean active) {
+        this.active = active;
     }
 
     public Instant getCreatedAt() {
@@ -98,7 +98,7 @@ public class AlertRules {
 
     public AlertRules(UUID id, Application application, String[] triggerEvents,
                    SeverityEnum minSeverity, ChannelTypeEnum channelType, Map<String, Object> channelConfig,
-                   String messageTemplate, Boolean isActive, Instant createdAt, Instant updatedAt) {
+                   String messageTemplate, Boolean active, Instant createdAt, Instant updatedAt) {
         this.id = id;
         this.application = application;
         this.triggerEvents = triggerEvents;
@@ -106,7 +106,7 @@ public class AlertRules {
         this.channelType = channelType;
         this.channelConfig = channelConfig;
         this.messageTemplate = messageTemplate;
-        this.isActive = isActive;
+        this.active = active;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
     }

@@ -23,7 +23,7 @@ public class AlertRulesResponseDTO {
     private ChannelTypeEnum channelType;
     private Map<String, Object> channelConfig;
     private String messageTemplate;
-    private Boolean isActive;
+    private Boolean active;
     private Instant createdAt;
     private Instant updatedAt;
 }

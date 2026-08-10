@@ -9,11 +9,11 @@ import com.audit.tracevault.core.domain.AlertNotification;
 import com.audit.tracevault.core.domain.ChannelTypeEnum;
 
 @Component
-public class AlertRulesNotificationChannel
+public class WebhookNotificationChannel
         implements NotificationChannel {
     private final RestClient restClient;
 
-    public AlertRulesNotificationChannel() {
+    public WebhookNotificationChannel() {
         this.restClient = RestClient.create();
     }
 

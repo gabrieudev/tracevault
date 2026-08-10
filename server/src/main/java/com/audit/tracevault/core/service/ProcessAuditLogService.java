@@ -47,7 +47,7 @@ public class ProcessAuditLogService
 
     private boolean matches(AlertRules rule,
             AuditLog log) {
-        return rule.getIsActive()
+        return rule.getActive()
                 && Arrays.stream(rule.getTriggerEvents()).anyMatch(event -> event.equals(log.getAction().toString()))
                 && log.getSeverity().ordinal() >= rule.getMinSeverity().ordinal();
     }

@@ -27,16 +27,10 @@ export const primaryNav: NavItem[] = [
 		description: "Motor de busca e rastreabilidade de eventos",
 	},
 	{
-		label: "Webhooks",
-		href: "/webhooks",
+		label: "Alertas",
+		href: "/alerts",
 		icon: Webhook,
 		description: "Integrações e alertas automáticos",
-	},
-	{
-		label: "Chamados",
-		href: "/chamados",
-		icon: LifeBuoy,
-		description: "Central de suporte",
 	},
 	{
 		label: "FAQ",

@@ -104,7 +104,7 @@ public class AlertRulesPersistenceAdapter implements AlertRulesPort {
         @Transactional(readOnly = true)
         public List<AlertRules> findActiveByApplication(Application application) {
                 List<AlertRulesEntity> activeAlertRulesEntities = springDataWebhookRepository
-                                .findByIsActiveAndApplication(true,
+                                .findByActiveAndApplication(true,
                                                 applicationPersistenceMapper.toEntity(application));
                 return activeAlertRulesEntities.stream()
                                 .map(webhookPersistenceMapper::toDomain)

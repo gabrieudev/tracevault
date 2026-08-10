@@ -11,5 +11,5 @@ import com.audit.tracevault.infrastructure.adapters.out.persistence.entity.Appli
 
 public interface SpringDataAlertRulesRepository
                 extends JpaRepository<AlertRulesEntity, UUID>, JpaSpecificationExecutor<AlertRulesEntity> {
-        List<AlertRulesEntity> findByIsActiveAndApplication(Boolean isActive, ApplicationEntity application);
+        List<AlertRulesEntity> findByActiveAndApplication(Boolean isActive, ApplicationEntity application);
 }

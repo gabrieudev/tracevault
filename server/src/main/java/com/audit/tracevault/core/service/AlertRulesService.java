@@ -4,6 +4,7 @@ import java.time.Instant;
 import java.util.UUID;
 
 import com.audit.tracevault.core.domain.AlertRules;
+import com.audit.tracevault.core.domain.Application;
 import com.audit.tracevault.core.domain.ApplicationStatusEnum;
 import com.audit.tracevault.core.exception.BusinessRuleException;
 import com.audit.tracevault.core.exception.ResourceNotFoundException;
@@ -11,17 +12,25 @@ import com.audit.tracevault.core.ports.in.AlertRulesInputQuery;
 import com.audit.tracevault.core.ports.in.AlertRulesUseCase;
 import com.audit.tracevault.core.ports.in.PageResult;
 import com.audit.tracevault.core.ports.out.AlertRulesPort;
+import com.audit.tracevault.core.ports.out.ApplicationRepositoryPort;
 
 public class AlertRulesService implements AlertRulesUseCase {
     private final AlertRulesPort alertRulesRepositoryPort;
+    private final ApplicationRepositoryPort applicationRepositoryPort;
 
-    public AlertRulesService(AlertRulesPort alertRulesRepositoryPort) {
+    public AlertRulesService(AlertRulesPort alertRulesRepositoryPort,
+                             ApplicationRepositoryPort applicationRepositoryPort) {
         this.alertRulesRepositoryPort = alertRulesRepositoryPort;
+        this.applicationRepositoryPort = applicationRepositoryPort;
     }
 
     @Override
     public AlertRules create(AlertRules alertRules) {
-        if (alertRules.getApplication().getStatus().equals(ApplicationStatusEnum.INACTIVE)) {
+        Application application = applicationRepositoryPort.findById(alertRules.getApplication().getId())
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "Application not found with id: " + alertRules.getApplication().getId()));
+
+        if (application.getStatus().equals(ApplicationStatusEnum.INACTIVE)) {
             throw new BusinessRuleException(
                     "Application with id: " + alertRules.getApplication().getId()
                             + " is inactive and cannot create alert rules.");
@@ -29,7 +38,7 @@ public class AlertRulesService implements AlertRulesUseCase {
 
         alertRules.setCreatedAt(Instant.now());
         alertRules.setUpdatedAt(Instant.now());
-        alertRules.setIsActive(true);
+        alertRules.setActive(true);
 
         return alertRulesRepositoryPort.save(alertRules);
     }
@@ -55,7 +64,7 @@ public class AlertRulesService implements AlertRulesUseCase {
         existingAlertRules.setMessageTemplate(alertRules.getMessageTemplate());
         existingAlertRules.setTriggerEvents(alertRules.getTriggerEvents());
         existingAlertRules.setMinSeverity(alertRules.getMinSeverity());
-        existingAlertRules.setIsActive(alertRules.getIsActive());
+        existingAlertRules.setActive(alertRules.getActive());
         existingAlertRules.setUpdatedAt(Instant.now());
 
         return alertRulesRepositoryPort.save(existingAlertRules);

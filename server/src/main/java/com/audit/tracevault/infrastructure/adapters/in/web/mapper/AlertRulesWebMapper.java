@@ -22,13 +22,11 @@ public interface AlertRulesWebMapper {
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "createdAt", ignore = true)
     @Mapping(target = "updatedAt", ignore = true)
-    @Mapping(target = "isActive", ignore = true)
     AlertRules toDomain(AlertRulesRequestDTO alertRulesRequestDTO);
 
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "createdAt", ignore = true)
     @Mapping(target = "updatedAt", ignore = true)
-    @Mapping(target = "isActive", ignore = true)
     AlertRules toDomain(UpdateAlertRulesDTO updateAlertRulesDTO);
 
     AlertRulesResponseDTO toResponseDTO(AlertRules alertRules);

@@ -4,7 +4,6 @@ export const applicationStatusSchema = z.enum(["ACTIVE", "INACTIVE"]);
 
 export const createApplicationSchema = z.object({
 	name: z.string().trim().min(1, "Nome obrigatório").max(150),
-
 	description: z.string().trim().max(500),
 });
 

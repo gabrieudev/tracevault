@@ -14,12 +14,15 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.audit.tracevault.core.domain.AlertRules;
+import com.audit.tracevault.core.domain.Application;
 import com.audit.tracevault.core.domain.ChannelTypeEnum;
 import com.audit.tracevault.core.ports.in.AlertRulesInputQuery;
 import com.audit.tracevault.core.ports.in.AlertRulesUseCase;
 import com.audit.tracevault.infrastructure.adapters.in.web.dto.PageResponse;
 import com.audit.tracevault.infrastructure.adapters.in.web.dto.alertrules.AlertRulesRequestDTO;
 import com.audit.tracevault.infrastructure.adapters.in.web.dto.alertrules.AlertRulesResponseDTO;
+import com.audit.tracevault.infrastructure.adapters.in.web.dto.alertrules.UpdateAlertRulesDTO;
 import com.audit.tracevault.infrastructure.adapters.in.web.mapper.AlertRulesWebMapper;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -30,6 +33,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import org.springframework.web.bind.annotation.PutMapping;
 
 @Tag(name = "Alert Rules", description = """
                 Endpoints responsible for managing alert rules. Alert rules allow you to define conditions under which alerts are triggered. Each alert rule belongs to an application and can be configured to listen for specific event types and severity levels.
@@ -184,5 +188,31 @@ public class AlertRulesController {
                                 alertRuleUseCase.findAll(query));
 
                 return ResponseEntity.status(200).body(response);
+        }
+
+        @Operation(summary = "Update an alert rule", description = """
+                        Updates an existing alert rule.
+
+                        Only the provided fields will be updated.
+                        """)
+        @ApiResponses({
+                        @ApiResponse(responseCode = "200", description = "Alert rule updated successfully"),
+                        @ApiResponse(responseCode = "400", description = "Invalid request", content = @Content),
+                        @ApiResponse(responseCode = "404", description = "Alert rule not found", content = @Content),
+                        @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content)
+        })
+        @PutMapping("/{id}")
+        public ResponseEntity<AlertRulesResponseDTO> update(
+                        @Parameter(description = "The ID of the alert rule to update") @PathVariable String id,
+                        @Valid @RequestBody UpdateAlertRulesDTO updateAlertRulesDTO) {
+                UUID uuid = id != null ? UUID.fromString(id) : null;
+
+                AlertRules updatedAlertRules = alertRuleUseCase.update(
+                                uuid,
+                                alertRulesWebMapper.toDomain(updateAlertRulesDTO));
+
+                return ResponseEntity
+                                .status(200)
+                                .body(alertRulesWebMapper.toResponseDTO(updatedAlertRules));
         }
 }

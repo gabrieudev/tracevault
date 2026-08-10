@@ -55,7 +55,7 @@ public class AlertRulesEntity {
     private String messageTemplate;
     
     @Column(name = "is_active", nullable = false)
-    private Boolean isActive;
+    private Boolean active;
 
     @Column(name = "created_at", nullable = false)
     private Instant createdAt;

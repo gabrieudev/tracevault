@@ -12,6 +12,8 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as SplatRouteImport } from './routes/$'
 import { Route as AppRouteImport } from './routes/_app'
 import { Route as AppIndexRouteImport } from './routes/_app.index'
+import { Route as AppAlertsIndexRouteImport } from './routes/_app.alerts.index'
+import { Route as AppAlertsIdRouteImport } from './routes/_app.alerts.$id'
 import { Route as AppApplicationsIndexRouteImport } from './routes/_app.applications.index'
 import { Route as AppApplicationsIdRouteImport } from './routes/_app.applications.$id'
 import { Route as AppLogsIndexRouteImport } from './routes/_app.logs.index'
@@ -29,6 +31,16 @@ const AppRoute = AppRouteImport.update({
 const AppIndexRoute = AppIndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppAlertsIndexRoute = AppAlertsIndexRouteImport.update({
+  id: '/alerts/',
+  path: '/alerts/',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppAlertsIdRoute = AppAlertsIdRouteImport.update({
+  id: '/alerts/$id',
+  path: '/alerts/$id',
   getParentRoute: () => AppRoute,
 } as any)
 const AppApplicationsIndexRoute = AppApplicationsIndexRouteImport.update({
@@ -55,16 +67,20 @@ const AppLogsIdRoute = AppLogsIdRouteImport.update({
 export interface FileRoutesByFullPath {
   '/$': typeof SplatRoute
   '/': typeof AppIndexRoute
+  '/alerts/$id': typeof AppAlertsIdRoute
   '/applications/$id': typeof AppApplicationsIdRoute
   '/logs/$id': typeof AppLogsIdRoute
+  '/alerts/': typeof AppAlertsIndexRoute
   '/applications/': typeof AppApplicationsIndexRoute
   '/logs/': typeof AppLogsIndexRoute
 }
 export interface FileRoutesByTo {
   '/$': typeof SplatRoute
   '/': typeof AppIndexRoute
+  '/alerts/$id': typeof AppAlertsIdRoute
   '/applications/$id': typeof AppApplicationsIdRoute
   '/logs/$id': typeof AppLogsIdRoute
+  '/alerts': typeof AppAlertsIndexRoute
   '/applications': typeof AppApplicationsIndexRoute
   '/logs': typeof AppLogsIndexRoute
 }
@@ -73,8 +89,10 @@ export interface FileRoutesById {
   '/$': typeof SplatRoute
   '/_app': typeof AppRouteWithChildren
   '/_app/': typeof AppIndexRoute
+  '/_app/alerts/$id': typeof AppAlertsIdRoute
   '/_app/applications/$id': typeof AppApplicationsIdRoute
   '/_app/logs/$id': typeof AppLogsIdRoute
+  '/_app/alerts/': typeof AppAlertsIndexRoute
   '/_app/applications/': typeof AppApplicationsIndexRoute
   '/_app/logs/': typeof AppLogsIndexRoute
 }
@@ -83,19 +101,31 @@ export interface FileRouteTypes {
   fullPaths:
     | '/$'
     | '/'
+    | '/alerts/$id'
     | '/applications/$id'
     | '/logs/$id'
+    | '/alerts/'
     | '/applications/'
     | '/logs/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/$' | '/' | '/applications/$id' | '/logs/$id' | '/applications' | '/logs'
+  to:
+    | '/$'
+    | '/'
+    | '/alerts/$id'
+    | '/applications/$id'
+    | '/logs/$id'
+    | '/alerts'
+    | '/applications'
+    | '/logs'
   id:
     | '__root__'
     | '/$'
     | '/_app'
     | '/_app/'
+    | '/_app/alerts/$id'
     | '/_app/applications/$id'
     | '/_app/logs/$id'
+    | '/_app/alerts/'
     | '/_app/applications/'
     | '/_app/logs/'
   fileRoutesById: FileRoutesById
@@ -126,6 +156,20 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof AppIndexRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/alerts/': {
+      id: '/_app/alerts/'
+      path: '/alerts'
+      fullPath: '/alerts/'
+      preLoaderRoute: typeof AppAlertsIndexRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/alerts/$id': {
+      id: '/_app/alerts/$id'
+      path: '/alerts/$id'
+      fullPath: '/alerts/$id'
+      preLoaderRoute: typeof AppAlertsIdRouteImport
       parentRoute: typeof AppRoute
     }
     '/_app/applications/': {
@@ -161,16 +205,20 @@ declare module '@tanstack/react-router' {
 
 interface AppRouteChildren {
   AppIndexRoute: typeof AppIndexRoute
+  AppAlertsIdRoute: typeof AppAlertsIdRoute
   AppApplicationsIdRoute: typeof AppApplicationsIdRoute
   AppLogsIdRoute: typeof AppLogsIdRoute
+  AppAlertsIndexRoute: typeof AppAlertsIndexRoute
   AppApplicationsIndexRoute: typeof AppApplicationsIndexRoute
   AppLogsIndexRoute: typeof AppLogsIndexRoute
 }
 
 const AppRouteChildren: AppRouteChildren = {
   AppIndexRoute: AppIndexRoute,
+  AppAlertsIdRoute: AppAlertsIdRoute,
   AppApplicationsIdRoute: AppApplicationsIdRoute,
   AppLogsIdRoute: AppLogsIdRoute,
+  AppAlertsIndexRoute: AppAlertsIndexRoute,
   AppApplicationsIndexRoute: AppApplicationsIndexRoute,
   AppLogsIndexRoute: AppLogsIndexRoute,
 }
