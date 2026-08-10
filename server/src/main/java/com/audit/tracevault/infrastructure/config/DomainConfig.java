@@ -9,10 +9,12 @@ import com.audit.tracevault.core.ports.out.ApiKeyCryptographyPort;
 import com.audit.tracevault.core.ports.out.ApplicationRepositoryPort;
 import com.audit.tracevault.core.ports.out.AuditLogEventPublisher;
 import com.audit.tracevault.core.ports.out.AuditLogRepositoryPort;
+import com.audit.tracevault.core.ports.out.DashboardRepositoryPort;
 import com.audit.tracevault.core.service.AlertRulesService;
 import com.audit.tracevault.core.service.ApiKeyCryptographyService;
 import com.audit.tracevault.core.service.ApplicationService;
 import com.audit.tracevault.core.service.AuditLogService;
+import com.audit.tracevault.core.service.DashboardService;
 import com.audit.tracevault.core.service.ProcessAuditLogService;
 
 @Configuration
@@ -27,6 +29,11 @@ public class DomainConfig {
     AlertRulesService webhookService(AlertRulesPort webhookRepositoryPort,
             ApplicationRepositoryPort applicationRepositoryPort) {
         return new AlertRulesService(webhookRepositoryPort, applicationRepositoryPort);
+    }
+
+    @Bean
+    DashboardService dashboardService(DashboardRepositoryPort dashboardRepositoryPort) {
+        return new DashboardService(dashboardRepositoryPort);
     }
 
     @Bean

@@ -36,8 +36,9 @@ public class ProcessAuditLogService
                 application);
 
         for (AlertRules rule : rules) {
-            if (!matches(rule, log))
+            if (!matches(rule, log) || !rule.getActive()) {
                 continue;
+            }
 
             AlertNotification notification = createNotification(rule, log);
             sender.send(notification);

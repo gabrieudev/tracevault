@@ -53,7 +53,7 @@ export function AlertsFilterBar({
 					<SelectValue placeholder="Canal" />
 				</SelectTrigger>
 				<SelectContent>
-					<SelectItem value="ALL">Todas aplicações</SelectItem>
+					<SelectItem value="ALL">Todas</SelectItem>
 					<SelectItem value="WEBHOOK">Webhook</SelectItem>
 					<SelectItem value="SLACK">Slack</SelectItem>
 					<SelectItem value="DISCORD">Discord</SelectItem>
@@ -74,7 +74,7 @@ export function AlertsFilterBar({
 					<SelectValue placeholder="Severidade mínima" />
 				</SelectTrigger>
 				<SelectContent>
-					<SelectItem value="ALL">Qualquer severidade</SelectItem>
+					<SelectItem value="ALL">Todos</SelectItem>
 					<SelectItem value="INFO">Info</SelectItem>
 					<SelectItem value="WARNING">Atenção</SelectItem>
 					<SelectItem value="CRITICAL">Crítico</SelectItem>
@@ -89,7 +89,7 @@ export function AlertsFilterBar({
 					<SelectValue placeholder="Status" />
 				</SelectTrigger>
 				<SelectContent>
-					<SelectItem value="ALL">Qualquer status</SelectItem>
+					<SelectItem value="ALL">Todos</SelectItem>
 					<SelectItem value="true">Ativo</SelectItem>
 					<SelectItem value="false">Inativo</SelectItem>
 				</SelectContent>

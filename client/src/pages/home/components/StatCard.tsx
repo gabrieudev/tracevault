@@ -21,22 +21,25 @@ export function StatCard({ label, value, icon: Icon, delta, index = 0 }: StatCar
 			initial={{ opacity: 0, y: 12 }}
 			animate={{ opacity: 1, y: 0 }}
 			transition={{ duration: 0.4, delay: index * 0.08, ease: "easeOut" }}
+			whileHover={{ y: -2 }}
 		>
-			<Card className="border-border bg-card shadow-sm">
+			<Card className="border-border bg-card shadow-sm transition-all duration-200 hover:shadow-md">
 				<CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-					<span className="text-xs font-medium uppercase tracking-wide text-muted-foreground">{label}</span>
-					<span className="flex h-8 w-8 items-center justify-center rounded-md bg-muted">
-						<Icon className="h-4 w-4 text-foreground" />
+					<span className="text-xs font-medium uppercase tracking-wider text-muted-foreground">{label}</span>
+					<span className="flex h-8 w-8 items-center justify-center rounded-md bg-zinc-100 dark:bg-zinc-800">
+						<Icon className="h-4 w-4 text-zinc-600 dark:text-zinc-300" />
 					</span>
 				</CardHeader>
 				<CardContent>
 					<div className="flex items-end justify-between">
-						<span className="font-mono text-2xl font-semibold text-foreground">{value}</span>
+						<span className="font-mono text-2xl font-semibold text-foreground tracking-tight">{value}</span>
 						{delta && (
-							<span
+							<div
 								className={cn(
-									"flex items-center gap-0.5 text-xs font-medium",
-									delta.tone === "negative" ? "text-destructive" : "text-primary",
+									"flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-medium",
+									delta.tone === "negative"
+										? "bg-red-50 text-red-600 dark:bg-red-950/50 dark:text-red-400"
+										: "bg-emerald-50 text-emerald-600 dark:bg-emerald-950/50 dark:text-emerald-400",
 								)}
 							>
 								{delta.direction === "up" ? (
@@ -45,7 +48,7 @@ export function StatCard({ label, value, icon: Icon, delta, index = 0 }: StatCar
 									<ArrowDownRight className="h-3.5 w-3.5" />
 								)}
 								{delta.value}
-							</span>
+							</div>
 						)}
 					</div>
 				</CardContent>

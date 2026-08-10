@@ -22,7 +22,6 @@ export function Sidebar() {
 					damping: 30,
 				}}
 			>
-				{/* Cabeçalho */}
 				<div className={`flex items-center py-6 ${collapsed ? "justify-center px-3" : "gap-2.5 px-6"}`}>
 					<span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md bg-sidebar-primary text-sidebar-primary-foreground">
 						<img src="/favicon.ico" alt="logo" />
@@ -36,7 +35,6 @@ export function Sidebar() {
 					)}
 				</div>
 
-				{/* Navegação */}
 				<nav className="flex-1 space-y-0.5 px-3 py-2">
 					{primaryNav.map((item) => {
 						const isActive = location.pathname === item.href;
@@ -91,7 +89,6 @@ export function Sidebar() {
 									</Link>
 								</TooltipTrigger>
 
-								{/* Tooltip sempre disponível, com a descrição do item */}
 								<TooltipContent side="right" className="text-xs">
 									{item.description}
 								</TooltipContent>
@@ -100,7 +97,6 @@ export function Sidebar() {
 					})}
 				</nav>
 
-				{/* Botão de toggle */}
 				<Tooltip>
 					<TooltipTrigger asChild>
 						<motion.button

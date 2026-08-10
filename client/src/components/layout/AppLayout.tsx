@@ -20,11 +20,13 @@ export function AppLayout() {
 
 			<div className="flex min-h-screen flex-1 flex-col">
 				<MobileNav />
+				
 				<Header title={title ?? "Audit Trail"} subtitle={subtitle} />
 
 				<main className="flex-1 px-4 pb-24 pt-4 md:px-8 md:pb-8 md:pt-6">
 					<Outlet />
 				</main>
+
 				<Footer />
 			</div>
 		</div>

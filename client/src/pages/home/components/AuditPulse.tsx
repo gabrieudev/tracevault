@@ -1,57 +1,105 @@
 import { motion } from "framer-motion";
+import { useMemo } from "react";
 
 interface AuditPulseProps {
 	className?: string;
+	data?: number[];
 }
 
-const PULSE_PATH =
-	"M0,40 L60,40 L78,40 L90,14 L102,64 L114,40 L150,40 L170,40 L184,22 L198,40 L230,40 L250,40 L262,52 L274,40 L420,40 L440,40 L455,8 L470,64 L484,40 L520,40 L538,40 L552,24 L566,40 L600,40 L620,40 L632,54 L644,40 L700,40";
+export function AuditPulse({ className, data = [] }: AuditPulseProps) {
+	// Fallback para uma linha neutra se não houver dados da API
+	const normalizedData = data.length > 1 ? data : Array(20).fill(10);
 
-export function AuditPulse({ className }: AuditPulseProps) {
+	const { linePath, areaPath, lastPoint } = useMemo(() => {
+		const width = 700;
+		const height = 80;
+		const paddingY = 15;
+		const usableHeight = height - paddingY * 2;
+
+		const max = Math.max(...normalizedData, 1);
+		const min = Math.min(...normalizedData, 0);
+		const range = max - min || 1;
+
+		const getX = (index: number) => (index / (normalizedData.length - 1)) * width;
+		const getY = (value: number) => {
+			const scaled = (value - min) / range;
+			return height - paddingY - scaled * usableHeight;
+		};
+
+		const points = normalizedData.map((val, i) => `${getX(i)},${getY(val)}`);
+
+		const linePath = `M ${points.join(" L ")}`;
+		const areaPath = `${linePath} L ${width},${height} L 0,${height} Z`;
+
+		const lastPoint = {
+			x: getX(normalizedData.length - 1),
+			y: getY(normalizedData[normalizedData.length - 1]),
+		};
+
+		return { linePath, areaPath, lastPoint };
+	}, [normalizedData]);
+
 	return (
 		<div className={className}>
 			<svg
 				viewBox="0 0 700 80"
-				className="h-16 w-full text-primary md:h-20"
+				className="h-16 w-full text-zinc-900 dark:text-zinc-100 md:h-20"
 				preserveAspectRatio="none"
 				fill="none"
 				role="img"
-				aria-label="Audit pulse visualization showing continuous event flow"
+				aria-label="Visualização em tempo real de eventos da API"
 			>
-				<title>Audit Pulse</title>
+				<title>Audit Pulse API</title>
+
+				<defs>
+					<linearGradient id="pulse-gradient" x1="0" x2="0" y1="0" y2="1">
+						<stop offset="0%" stopColor="currentColor" stopOpacity="0.15" />
+						<stop offset="100%" stopColor="currentColor" stopOpacity="0" />
+					</linearGradient>
+				</defs>
+
 				<line
 					x1="0"
-					y1="40"
+					y1="65"
 					x2="700"
-					y2="40"
+					y2="65"
 					stroke="currentColor"
-					strokeOpacity="0.2"
+					strokeOpacity="0.1"
 					strokeWidth="1"
-					strokeDasharray="2 6"
+					strokeDasharray="4 4"
 				/>
 
 				<motion.path
-					d={PULSE_PATH}
+					d={areaPath}
+					fill="url(#pulse-gradient)"
+					initial={{ opacity: 0 }}
+					animate={{ opacity: 1 }}
+					transition={{ duration: 1 }}
+				/>
+
+				<motion.path
+					d={linePath}
 					stroke="currentColor"
 					strokeWidth="2"
 					strokeLinecap="round"
 					strokeLinejoin="round"
 					initial={{ pathLength: 0, opacity: 0 }}
 					animate={{ pathLength: 1, opacity: 1 }}
-					transition={{ duration: 1.6, ease: "easeInOut" }}
+					transition={{ duration: 1.5, ease: "easeOut" }}
 				/>
 
 				<motion.circle
-					cy={40}
+					cx={lastPoint.x}
+					cy={lastPoint.y}
 					r={4}
 					fill="currentColor"
-					initial={{ cx: 0, opacity: 0 }}
-					animate={{ cx: 700, opacity: [0, 1, 0.8, 0] }}
+					initial={{ scale: 0, opacity: 0 }}
+					animate={{ scale: [1, 1.5, 1], opacity: [1, 0.5, 1] }}
 					transition={{
-						delay: 1.6,
-						duration: 2.8,
+						delay: 1.5,
+						duration: 2,
 						repeat: Infinity,
-						ease: "linear",
+						ease: "easeInOut",
 					}}
 				/>
 			</svg>
