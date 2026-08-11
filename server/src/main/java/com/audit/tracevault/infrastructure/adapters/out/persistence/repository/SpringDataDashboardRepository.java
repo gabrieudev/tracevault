@@ -2,6 +2,7 @@ package com.audit.tracevault.infrastructure.adapters.out.persistence.repository;
 
 import java.sql.Array;
 import java.sql.SQLException;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -25,6 +26,9 @@ import com.audit.tracevault.core.domain.dashboard.interfaces.StatMetricDTO;
 
 @Repository
 public class SpringDataDashboardRepository {
+
+    private static final int DASHBOARD_LIMIT = 5;
+
     private final JdbcTemplate jdbcTemplate;
 
     public SpringDataDashboardRepository(JdbcTemplate jdbcTemplate) {
@@ -40,61 +44,120 @@ public class SpringDataDashboardRepository {
                 """);
 
         List<Object> params = new ArrayList<>();
+
         if (applicationId != null) {
             sql.append(" WHERE id = ?");
             params.add(applicationId);
         }
 
-        return jdbcTemplate.queryForObject(sql.toString(), (rs, rowNum) -> new ActiveApplicationsDTOImpl(
-                rs.getInt("active"),
-                rs.getInt("total")), params.toArray());
+        return jdbcTemplate.queryForObject(
+                sql.toString(),
+                (rs, rowNum) -> new ActiveApplicationsDTOImpl(
+                        rs.getInt("active"),
+                        rs.getInt("total")),
+                params.toArray());
     }
 
     public List<ApplicationVolumeDTO> getApplicationsVolume(UUID applicationId) {
         StringBuilder sql = new StringBuilder("""
                     SELECT
                         a.name,
-                        COUNT(l.id) as events_count,
-                        ROUND(COUNT(l.id) * 100.0 / NULLIF((SELECT COUNT(*) FROM audit_log), 0)) as percentage
+                        COUNT(l.id) AS events_count,
+                        ROUND(
+                            COUNT(l.id) * 100.0
+                            / NULLIF((SELECT COUNT(*) FROM audit_log), 0)
+                        ) AS percentage
                     FROM application a
                     LEFT JOIN audit_log l ON l.application_id = a.id
                 """);
 
         List<Object> params = new ArrayList<>();
+
         if (applicationId != null) {
             sql.append(" WHERE a.id = ?");
             params.add(applicationId);
         }
-        sql.append(" GROUP BY a.id, a.name");
 
-        return jdbcTemplate.query(sql.toString(), (rs, rowNum) -> new ApplicationVolumeDTOImpl(
-                rs.getString("name"),
-                rs.getInt("events_count"),
-                rs.getInt("percentage")), params.toArray());
+        sql.append("""
+                    GROUP BY a.id, a.name
+                    ORDER BY events_count DESC
+                    LIMIT ?
+                """);
+
+        params.add(DASHBOARD_LIMIT);
+
+        return jdbcTemplate.query(
+                sql.toString(),
+                (rs, rowNum) -> new ApplicationVolumeDTOImpl(
+                        rs.getString("name"),
+                        rs.getInt("events_count"),
+                        rs.getInt("percentage")),
+                params.toArray());
     }
 
-    public List<RecentEventDTO> getRecentEvents(UUID applicationId, int limit) {
+    public List<RecentEventDTO> getRecentEvents(UUID applicationId) {
         StringBuilder sql = new StringBuilder("""
-                    SELECT id, action, resource_type, resource_id, actor_name, severity, occurred_at
+                    SELECT
+                        id,
+                        action,
+                        resource_type,
+                        resource_id,
+                        actor_name,
+                        severity,
+                        occurred_at
                     FROM audit_log
                 """);
 
         List<Object> params = new ArrayList<>();
+
         if (applicationId != null) {
             sql.append(" WHERE application_id = ?");
             params.add(applicationId);
         }
-        sql.append(" ORDER BY occurred_at DESC LIMIT ?");
-        params.add(limit);
 
-        return jdbcTemplate.query(sql.toString(), (rs, rowNum) -> new RecentEventDTOImpl(
-                UUID.fromString(rs.getString("id")),
-                ActionEnum.valueOf(rs.getString("action")),
-                rs.getString("resource_type"),
-                rs.getString("resource_id"),
-                rs.getString("actor_name"),
-                SeverityEnum.valueOf(rs.getString("severity")),
-                rs.getTimestamp("occurred_at").toInstant()), params.toArray());
+        sql.append("""
+                    ORDER BY occurred_at DESC
+                    LIMIT ?
+                """);
+
+        params.add(DASHBOARD_LIMIT);
+
+        return jdbcTemplate.query(
+                sql.toString(),
+                (rs, rowNum) -> new RecentEventDTOImpl(
+                        UUID.fromString(rs.getString("id")),
+                        ActionEnum.valueOf(rs.getString("action")),
+                        rs.getString("resource_type"),
+                        rs.getString("resource_id"),
+                        rs.getString("actor_name"),
+                        SeverityEnum.valueOf(rs.getString("severity")),
+                        rs.getTimestamp("occurred_at").toInstant()),
+                params.toArray());
+    }
+
+    public Instant getLastLogTimestamp(UUID applicationId) {
+        StringBuilder sql = new StringBuilder("""
+                    SELECT MAX(occurred_at) AS last_log_timestamp
+                    FROM audit_log
+                """);
+
+        List<Object> params = new ArrayList<>();
+
+        if (applicationId != null) {
+            sql.append(" WHERE application_id = ?");
+            params.add(applicationId);
+        }
+
+        return jdbcTemplate.queryForObject(
+                sql.toString(),
+                (rs, rowNum) -> {
+                    java.sql.Timestamp timestamp = rs.getTimestamp("last_log_timestamp");
+
+                    return timestamp != null
+                            ? timestamp.toInstant()
+                            : null;
+                },
+                params.toArray());
     }
 
     public StatMetricDTO getEventsToday(UUID applicationId) {
@@ -108,18 +171,25 @@ public class SpringDataDashboardRepository {
                 """);
 
         List<Object> params = new ArrayList<>();
+
         if (applicationId != null) {
             sql.append(" AND application_id = ?");
             params.add(applicationId);
         }
 
-        return jdbcTemplate.queryForObject(sql.toString(), (rs, rowNum) -> new StatMetricDTOImpl(
-                rs.getInt("value"),
-                rs.getString("delta"),
-                DashboardTrendEnum.valueOf(rs.getString("trend"))), params.toArray());
+        return jdbcTemplate.queryForObject(
+                sql.toString(),
+                (rs, rowNum) -> new StatMetricDTOImpl(
+                        rs.getInt("value"),
+                        rs.getString("delta"),
+                        DashboardTrendEnum.valueOf(rs.getString("trend"))),
+                params.toArray());
     }
 
-    public StatMetricDTO getCriticalAlerts24h(UUID applicationId, int pulseWindowMinutes) {
+    public StatMetricDTO getCriticalAlerts24h(
+            UUID applicationId,
+            int pulseWindowMinutes) {
+
         StringBuilder sql = new StringBuilder("""
                     SELECT
                         COUNT(*) AS value,
@@ -132,18 +202,25 @@ public class SpringDataDashboardRepository {
 
         List<Object> params = new ArrayList<>();
         params.add(pulseWindowMinutes);
+
         if (applicationId != null) {
             sql.append(" AND application_id = ?");
             params.add(applicationId);
         }
 
-        return jdbcTemplate.queryForObject(sql.toString(), (rs, rowNum) -> new StatMetricDTOImpl(
-                rs.getInt("value"),
-                rs.getString("delta"),
-                DashboardTrendEnum.valueOf(rs.getString("trend"))), params.toArray());
+        return jdbcTemplate.queryForObject(
+                sql.toString(),
+                (rs, rowNum) -> new StatMetricDTOImpl(
+                        rs.getInt("value"),
+                        rs.getString("delta"),
+                        DashboardTrendEnum.valueOf(rs.getString("trend"))),
+                params.toArray());
     }
 
-    public StatMetricDTO getLoginFailures24h(UUID applicationId, int pulseWindowMinutes) {
+    public StatMetricDTO getLoginFailures24h(
+            UUID applicationId,
+            int pulseWindowMinutes) {
+
         StringBuilder sql = new StringBuilder("""
                     SELECT
                         COUNT(*) AS value,
@@ -156,18 +233,24 @@ public class SpringDataDashboardRepository {
 
         List<Object> params = new ArrayList<>();
         params.add(pulseWindowMinutes);
+
         if (applicationId != null) {
             sql.append(" AND application_id = ?");
             params.add(applicationId);
         }
 
-        return jdbcTemplate.queryForObject(sql.toString(), (rs, rowNum) -> new StatMetricDTOImpl(
-                rs.getInt("value"),
-                rs.getString("delta"),
-                DashboardTrendEnum.valueOf(rs.getString("trend"))), params.toArray());
+        return jdbcTemplate.queryForObject(
+                sql.toString(),
+                (rs, rowNum) -> new StatMetricDTOImpl(
+                        rs.getInt("value"),
+                        rs.getString("delta"),
+                        DashboardTrendEnum.valueOf(rs.getString("trend"))),
+                params.toArray());
     }
 
-    public AuditPulseDTO getAuditPulse(UUID applicationId, int pulseWindowMinutes) {
+    public AuditPulseDTO getAuditPulse(
+            UUID applicationId,
+            int pulseWindowMinutes) {
 
         StringBuilder sql = new StringBuilder("""
                 SELECT
@@ -207,7 +290,7 @@ public class SpringDataDashboardRepository {
 
         if (applicationId != null) {
             sql.append("""
-                    AND application_id = ?
+                        AND application_id = ?
                     """);
 
             params.add(applicationId);

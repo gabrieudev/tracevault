@@ -1,5 +1,7 @@
 package com.audit.tracevault.core.domain.dashboard.impl;
 
+import java.time.Instant;
+
 import com.audit.tracevault.core.domain.dashboard.interfaces.ApplicationVolumeDTO;
 import com.audit.tracevault.core.domain.dashboard.interfaces.AuditPulseDTO;
 import com.audit.tracevault.core.domain.dashboard.interfaces.DashboardStatsDTO;
@@ -11,13 +13,15 @@ public class DashboardSummaryResponseDTOImpl implements DashboardSummaryResponse
     private final DashboardStatsDTO stats;
     private final ApplicationVolumeDTO[] applicationsVolume;
     private final RecentEventDTO[] recentEvents;
+    private final Instant lastLogTimestamp;
 
     public DashboardSummaryResponseDTOImpl(AuditPulseDTO auditPulse, DashboardStatsDTO stats,
-            ApplicationVolumeDTO[] applicationsVolume, RecentEventDTO[] recentEvents) {
+            ApplicationVolumeDTO[] applicationsVolume, RecentEventDTO[] recentEvents, Instant lastLogTimestamp) {
         this.auditPulse = auditPulse;
         this.stats = stats;
         this.applicationsVolume = applicationsVolume;
         this.recentEvents = recentEvents;
+        this.lastLogTimestamp = lastLogTimestamp;
     }
 
     @Override
@@ -38,5 +42,10 @@ public class DashboardSummaryResponseDTOImpl implements DashboardSummaryResponse
     @Override
     public RecentEventDTO[] getRecentEvents() {
         return recentEvents;
+    }
+
+    @Override
+    public Instant getLastLogTimestamp() {
+        return lastLogTimestamp;
     }
 }

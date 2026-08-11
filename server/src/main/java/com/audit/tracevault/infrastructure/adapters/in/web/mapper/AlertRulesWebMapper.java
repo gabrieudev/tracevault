@@ -9,6 +9,7 @@ import org.springframework.data.domain.Pageable;
 
 import com.audit.tracevault.core.domain.AlertRules;
 import com.audit.tracevault.core.domain.ChannelTypeEnum;
+import com.audit.tracevault.core.domain.SeverityEnum;
 import com.audit.tracevault.core.ports.in.AlertRulesInputQuery;
 import com.audit.tracevault.core.ports.in.PageResult;
 import com.audit.tracevault.core.ports.in.SortDirection;
@@ -38,7 +39,7 @@ public interface AlertRulesWebMapper {
             String messageTemplate,
             ChannelTypeEnum channelType,
             String[] triggerEvents,
-            String minSeverity,
+            SeverityEnum minSeverity,
             Boolean isActive,
             Instant createdFrom,
             Instant createdTo,

@@ -1,5 +1,6 @@
 package com.audit.tracevault.core.ports.out;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 
@@ -12,7 +13,7 @@ import com.audit.tracevault.core.domain.dashboard.interfaces.StatMetricDTO;
 public interface DashboardRepositoryPort {
     List<ApplicationVolumeDTO> getApplicationsVolume(UUID applicationId);
 
-    List<RecentEventDTO> getRecentEvents(UUID applicationId, int limit);
+    List<RecentEventDTO> getRecentEvents(UUID applicationId);
 
     ActiveApplicationsDTO getActiveApplications(UUID applicationId);
 
@@ -23,4 +24,6 @@ public interface DashboardRepositoryPort {
     StatMetricDTO getLoginFailures24h(UUID applicationId, int pulseWindowMinutes);
 
     AuditPulseDTO getAuditPulse(UUID applicationId, int pulseWindowMinutes);
+
+    Instant getLastLogTimestamp(UUID applicationId);
 }

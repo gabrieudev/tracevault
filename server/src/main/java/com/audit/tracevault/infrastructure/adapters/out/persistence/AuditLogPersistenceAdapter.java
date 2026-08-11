@@ -62,6 +62,7 @@ public class AuditLogPersistenceAdapter implements AuditLogRepositoryPort {
                                 .and(AuditLogSpecification.hasActorId(queryInput.actorId()))
                                 .and(AuditLogSpecification.hasActorName(queryInput.actorName()))
                                 .and(AuditLogSpecification.hasActorIp(queryInput.actorIp()))
+                                .and(AuditLogSpecification.hasSeverity(queryInput.severity()))
                                 .and(AuditLogSpecification.hasActorUserAgent(queryInput.actorUserAgent()))
                                 .and(AuditLogSpecification.hasAction(queryInput.action()))
                                 .and(AuditLogSpecification.hasResourceType(queryInput.resourceType()))

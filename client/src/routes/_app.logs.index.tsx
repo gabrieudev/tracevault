@@ -14,6 +14,7 @@ const logsSearchSchema = z.object({
 	resourceType: z.string().optional(),
 	occurredFrom: z.string().optional(),
 	occurredTo: z.string().optional(),
+	id: z.string().optional(),
 });
 
 export type LogsSearch = z.infer<typeof logsSearchSchema>;

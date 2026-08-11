@@ -115,9 +115,7 @@ export function AuditLogsFilterBar({
 
 	return (
 		<div className="rounded-xl border bg-card/60 p-4 shadow-sm backdrop-blur-sm transition-all dark:bg-card/40">
-			{/* Filtros principais */}
 			<div className="flex flex-wrap items-end gap-3">
-				{/* Busca - ocupa o máximo de espaço */}
 				<div className="relative flex-1 min-w-45">
 					<Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
 					<Input
@@ -128,7 +126,6 @@ export function AuditLogsFilterBar({
 					/>
 				</div>
 
-				{/* Aplicação */}
 				<SearchCombobox
 					className="min-w-40 flex-1 sm:flex-initial"
 					value={filters.applicationId}
@@ -141,7 +138,6 @@ export function AuditLogsFilterBar({
 					]}
 				/>
 
-				{/* Ação */}
 				<SearchCombobox
 					className="min-w-40 flex-1 sm:flex-initial"
 					value={filters.action}
@@ -156,7 +152,6 @@ export function AuditLogsFilterBar({
 					]}
 				/>
 
-				{/* Severidade */}
 				<Select
 					value={filters.severity ?? "ALL"}
 					onValueChange={(v) => onFilterChange({ severity: v as LogsSearch["severity"] })}
@@ -172,7 +167,6 @@ export function AuditLogsFilterBar({
 					</SelectContent>
 				</Select>
 
-				{/* Botão Mais Filtros */}
 				<Button
 					type="button"
 					variant={advancedOpen || activeAdvancedCount > 0 ? "secondary" : "outline"}
@@ -190,7 +184,6 @@ export function AuditLogsFilterBar({
 				</Button>
 			</div>
 
-			{/* Filtros avançados (expansível) */}
 			<AnimatePresence initial={false}>
 				{advancedOpen && (
 					<motion.div
@@ -202,7 +195,6 @@ export function AuditLogsFilterBar({
 					>
 						<div className="rounded-lg bg-muted/30 p-4 dark:bg-muted/10">
 							<div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-								{/* Ator (ID) */}
 								<div className="space-y-1.5">
 									<label htmlFor="actorId" className="text-xs font-medium text-muted-foreground">
 										Ator (ID ou e-mail)
@@ -215,7 +207,6 @@ export function AuditLogsFilterBar({
 									/>
 								</div>
 
-								{/* Tipo de recurso */}
 								<div className="space-y-1.5">
 									<label htmlFor="resourceType" className="text-xs font-medium text-muted-foreground">
 										Tipo de recurso
@@ -228,7 +219,6 @@ export function AuditLogsFilterBar({
 									/>
 								</div>
 
-								{/* Data inicial */}
 								<div className="space-y-1.5">
 									<label htmlFor="occurredFrom" className="text-xs font-medium text-muted-foreground">
 										Ocorrido de
@@ -242,7 +232,6 @@ export function AuditLogsFilterBar({
 									/>
 								</div>
 
-								{/* Data final */}
 								<div className="space-y-1.5">
 									<label htmlFor="occurredTo" className="text-xs font-medium text-muted-foreground">
 										Ocorrido até
@@ -257,7 +246,6 @@ export function AuditLogsFilterBar({
 								</div>
 							</div>
 
-							{/* Ações do painel avançado */}
 							{activeAdvancedCount > 0 && (
 								<div className="mt-4 flex justify-end border-t border-border/50 pt-3">
 									<Button

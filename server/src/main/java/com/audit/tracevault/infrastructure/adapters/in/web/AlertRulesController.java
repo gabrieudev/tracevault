@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.audit.tracevault.core.domain.AlertRules;
 import com.audit.tracevault.core.domain.Application;
 import com.audit.tracevault.core.domain.ChannelTypeEnum;
+import com.audit.tracevault.core.domain.SeverityEnum;
 import com.audit.tracevault.core.ports.in.AlertRulesInputQuery;
 import com.audit.tracevault.core.ports.in.AlertRulesUseCase;
 import com.audit.tracevault.infrastructure.adapters.in.web.dto.PageResponse;
@@ -133,7 +134,7 @@ public class AlertRulesController {
 
                         @Parameter(description = "Subscribed trigger events.", example = "USER_CREATED", in = ParameterIn.QUERY) @RequestParam(required = false) String[] triggerEvents,
 
-                        @Parameter(description = "Minimum severity level required to trigger notifications.", example = "WARNING", in = ParameterIn.QUERY) @RequestParam(required = false) String minSeverity,
+                        @Parameter(description = "Minimum severity level required to trigger notifications.", example = "WARNING", in = ParameterIn.QUERY) @RequestParam(required = false) SeverityEnum minSeverity,
 
                         @Parameter(description = "Whether the alert rule is active.", example = "true", in = ParameterIn.QUERY) @RequestParam(required = false) Boolean isActive,
 

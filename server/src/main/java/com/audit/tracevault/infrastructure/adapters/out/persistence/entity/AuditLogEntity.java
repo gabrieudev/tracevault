@@ -12,6 +12,8 @@ import com.audit.tracevault.core.domain.SeverityEnum;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -70,7 +72,8 @@ public class AuditLogEntity {
     @JdbcTypeCode(SqlTypes.JSON)
     private Map<String, Object> metadata;
     
-    @Column(name = "severity", nullable = false)
+    @Column(name = "severity", nullable = false, columnDefinition = "audit_severity")
+    @Enumerated(EnumType.STRING)
     @JdbcTypeCode(SqlTypes.NAMED_ENUM)
     private SeverityEnum severity;
     

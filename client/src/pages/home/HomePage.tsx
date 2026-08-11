@@ -1,19 +1,17 @@
-import { useSearch, useNavigate } from "@tanstack/react-router";
-import { AuditPulse } from "@/pages/home/components/AuditPulse";
-import { StatCard } from "@/pages/home/components/StatCard";
-import { useHomeSummary } from "./use-home";
-import { useApplications } from "@/pages/applications/use-applications";
+import { AnimatedBadge } from "@/components/motion/animated-badge";
+import { SearchCombobox } from "@/components/SearchCombobox";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Link } from "@tanstack/react-router";
-import { motion } from "framer-motion";
-import { Activity, ArrowRight, Boxes, KeyRound, ShieldAlert } from "lucide-react";
-import { AnimatedBadge } from "@/components/motion/animated-badge";
+import { useApplications } from "@/pages/applications/use-applications";
+import { AuditPulse } from "@/pages/home/components/AuditPulse";
+import { StatCard } from "@/pages/home/components/StatCard";
+import { Link, useNavigate, useSearch } from "@tanstack/react-router";
 import { formatDistanceToNow } from "date-fns";
 import { ptBR } from "date-fns/locale";
-import { SearchCombobox } from "@/components/SearchCombobox";
+import { motion } from "framer-motion";
+import { Activity, ArrowRight, Boxes, KeyRound, ShieldAlert } from "lucide-react";
+import { useHomeSummary } from "./use-home";
 
 export interface HomeSearch {
 	applicationId?: string;
@@ -28,11 +26,7 @@ export function Home() {
 		from: "/",
 	});
 
-	const {
-		data: homeData,
-		isLoading: isHomeLoading,
-		dataUpdatedAt,
-	} = useHomeSummary({
+	const { data: homeData, isLoading: isHomeLoading } = useHomeSummary({
 		applicationId: applicationId === "ALL" ? undefined : applicationId,
 	});
 
@@ -50,7 +44,6 @@ export function Home() {
 		});
 	}
 
-	const lastUpdateDate = dataUpdatedAt ? new Date(dataUpdatedAt) : null;
 	const isInitialLoading = isHomeLoading && !homeData;
 
 	return (
@@ -61,15 +54,20 @@ export function Home() {
 					<p className="text-sm text-muted-foreground">Visão geral e monitoramento de eventos de auditoria.</p>
 				</div>
 				<div className="flex justify-end w-full sm:w-62.5">
-					<SearchCombobox
-						placeholder="Filtrar por aplicação"
-						value={applicationId || "ALL"}
-						onChange={updateApplicationFilter}
-						options={[
-							{ value: "ALL", label: "Todas as aplicações" },
-							...(applicationsData?.content.map((app) => ({ value: app.id, label: app.name })) || []),
-						]}
-					/>
+					{isAppsLoading ? (
+						<Skeleton className="h-10 w-full" />
+					) : (
+						<SearchCombobox
+							placeholder="Filtrar por aplicação"
+							value={applicationId || "ALL"}
+							onChange={updateApplicationFilter}
+							emptyText="Nenhuma aplicação encontrada"
+							options={[
+								{ value: "ALL", label: "Todas as aplicações" },
+								...(applicationsData?.content.map((app) => ({ value: app.id, label: app.name })) || []),
+							]}
+						/>
+					)}
 				</div>
 			</div>
 
@@ -79,8 +77,10 @@ export function Home() {
 						<div>
 							<h3 className="text-sm font-semibold text-foreground">Fluxo de eventos em tempo real</h3>
 							<p className="mt-0.5 font-mono text-[11px] text-muted-foreground">
-								POST /api/v1/dashboard/summary · última ingestão{" "}
-								{lastUpdateDate ? lastUpdateDate.toLocaleTimeString("pt-BR") : "aguardando..."}
+								POST /logs ·{" "}
+								{homeData?.lastLogTimestamp
+									? new Date(homeData.lastLogTimestamp).toLocaleString("pt-BR")
+									: "Nenhum evento recebido ainda"}
 							</p>
 						</div>
 						<div className="hidden items-center gap-2 rounded-full border border-border bg-zinc-50 px-3 py-1.5 dark:bg-zinc-900 sm:flex">
@@ -162,11 +162,18 @@ export function Home() {
 
 			<div className="grid grid-cols-1 gap-4 lg:grid-cols-5">
 				<Card className="border-border bg-card shadow-sm lg:col-span-2">
-					<CardHeader>
-						<CardTitle className="text-sm font-semibold">Volume por aplicação</CardTitle>
-						<CardDescription className="text-xs text-muted-foreground">
-							Eventos recebidos nas últimas 24 horas
-						</CardDescription>
+					<CardHeader className="flex flex-row items-center justify-between space-y-0">
+						<div>
+							<CardTitle className="text-sm font-semibold">Volume por aplicação</CardTitle>
+							<CardDescription className="text-xs text-muted-foreground">
+								Eventos recebidos nas últimas 24 horas
+							</CardDescription>
+						</div>
+						<Button asChild variant="ghost" size="sm" className="h-8 gap-1 text-xs hover:bg-zinc-100 dark:hover:bg-zinc-800">
+							<Link to="/applications">
+								Ver todas <ArrowRight className="h-3.5 w-3.5" />
+							</Link>
+						</Button>
 					</CardHeader>
 					<CardContent className="space-y-5">
 						{isInitialLoading ? (
@@ -232,7 +239,16 @@ export function Home() {
 									initial={{ opacity: 0, x: -6 }}
 									animate={{ opacity: 1, x: 0 }}
 									transition={{ duration: 0.3, delay: 0.4 + i * 0.06 }}
-									className="group flex items-center justify-between gap-3 rounded-lg px-3 py-2.5 transition-colors hover:bg-zinc-50 dark:hover:bg-zinc-900/50"
+									className="group flex items-center justify-between gap-3 rounded-lg px-3 py-2.5 transition-colors hover:bg-zinc-50 dark:hover:bg-zinc-800/50 cursor-pointer"
+									onClick={() => {
+										navigate({
+											to: "/logs",
+											search: (prev) => ({
+												...prev,
+												id: event.id,
+											}),
+										});
+									}}
 								>
 									<div className="flex min-w-0 items-center gap-3">
 										<AnimatedBadge

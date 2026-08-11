@@ -35,6 +35,7 @@ export interface RecentEventDTO {
 	resourceId: string;
 	actorName: string;
 	severity: Severity;
+	actorId: string;
 	occurredAt: string;
 }
 
@@ -43,6 +44,7 @@ export interface HomeSummaryResponseDTO {
 	stats: HomeStatsDTO;
 	applicationsVolume: ApplicationVolumeDTO[];
 	recentEvents: RecentEventDTO[];
+	lastLogTimestamp: string | null;
 }
 
 export interface HomeFilters {

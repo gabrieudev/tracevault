@@ -1,18 +1,14 @@
-import { Link, useLocation } from "@tanstack/react-router";
-import { motion } from "framer-motion";
-import { Menu, Bug, ScrollText } from "lucide-react";
-import { primaryNav } from "@/config/nav-items";
-import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
-
-const bottomShortcuts = primaryNav.slice(0, 3);
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
+import { primaryNav } from "@/config/nav-items";
+import { Link, useLocation } from "@tanstack/react-router";
+import { Menu, ScrollText } from "lucide-react";
 
 export function MobileNav() {
 	const location = useLocation();
 
 	return (
 		<>
-			{/* Barra superior */}
 			<div className="flex items-center justify-between border-b border-border bg-background px-4 py-3 md:hidden">
 				<div className="flex items-center gap-2">
 					<span className="flex h-7 w-7 items-center justify-center rounded-md bg-muted">
@@ -51,9 +47,8 @@ export function MobileNav() {
 				</Sheet>
 			</div>
 
-			{/* Barra inferior fixa */}
 			<nav className="fixed inset-x-0 bottom-0 z-40 flex items-center justify-around border-t border-border bg-background px-2 py-2 md:hidden">
-				{bottomShortcuts.map((item) => {
+				{primaryNav.map((item) => {
 					const isActive = location.pathname === item.href;
 					return (
 						<Link
@@ -67,17 +62,6 @@ export function MobileNav() {
 						</Link>
 					);
 				})}
-
-				{/* Reportar Bug */}
-				<Link to="/chamados/novo" search={{ tipo: "bug" }} className="flex flex-col items-center gap-1 px-3 py-1.5">
-					<motion.span
-						whileTap={{ scale: 0.92 }}
-						className="flex h-9 w-9 items-center justify-center rounded-full bg-destructive"
-					>
-						<Bug className="h-4.5 w-4.5 text-white" />
-					</motion.span>
-					<span className="text-[10px] text-destructive">Bug</span>
-				</Link>
 			</nav>
 		</>
 	);

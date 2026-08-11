@@ -6,6 +6,7 @@ import java.util.UUID;
 import org.springframework.data.jpa.domain.Specification;
 
 import com.audit.tracevault.core.domain.ActionEnum;
+import com.audit.tracevault.core.domain.SeverityEnum;
 import com.audit.tracevault.infrastructure.adapters.out.persistence.entity.AuditLogEntity;
 
 public class AuditLogSpecification {
@@ -34,6 +35,12 @@ public class AuditLogSpecification {
         return (root, query, cb) -> applicationId == null
                 ? cb.conjunction()
                 : cb.equal(root.get("application").get("id"), applicationId);
+    }
+
+    public static Specification<AuditLogEntity> hasSeverity(SeverityEnum severity) {
+        return (root, query, cb) -> severity == null
+                ? cb.conjunction()
+                : cb.equal(root.get("severity"), severity);
     }
 
     public static Specification<AuditLogEntity> hasActorId(String actorId) {

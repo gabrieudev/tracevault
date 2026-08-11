@@ -1,5 +1,6 @@
 package com.audit.tracevault.core.service;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 
@@ -25,7 +26,6 @@ public class DashboardService implements DashboardUseCase {
     @Override
     public DashboardSummaryResponseDTO getDashboardSummary(UUID applicationId, Integer pulseWindowMinutes) {
         int windowMinutes = pulseWindowMinutes != null ? pulseWindowMinutes : 1440;
-        int recentEventsLimit = 10;
 
         AuditPulseDTO auditPulse = dashboardRepositoryPort.getAuditPulse(applicationId, windowMinutes);
 
@@ -44,14 +44,17 @@ public class DashboardService implements DashboardUseCase {
         List<ApplicationVolumeDTO> volumeList = dashboardRepositoryPort.getApplicationsVolume(applicationId);
         ApplicationVolumeDTO[] applicationsVolume = volumeList.toArray(new ApplicationVolumeDTO[0]);
 
-        List<RecentEventDTO> eventsList = dashboardRepositoryPort.getRecentEvents(applicationId, recentEventsLimit);
+        List<RecentEventDTO> eventsList = dashboardRepositoryPort.getRecentEvents(applicationId);
         RecentEventDTO[] recentEvents = eventsList.toArray(new RecentEventDTO[0]);
+
+        Instant lastLogTimestamp = dashboardRepositoryPort.getLastLogTimestamp(applicationId);
 
         return new DashboardSummaryResponseDTOImpl(
                 auditPulse,
                 stats,
                 applicationsVolume,
-                recentEvents
+                recentEvents,
+                lastLogTimestamp
         );
     }
 }

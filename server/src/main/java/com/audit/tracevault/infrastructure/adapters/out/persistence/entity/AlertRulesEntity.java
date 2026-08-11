@@ -12,6 +12,8 @@ import com.audit.tracevault.core.domain.SeverityEnum;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -35,12 +37,13 @@ public class AlertRulesEntity {
     @ManyToOne
     @JoinColumn(name = "application_id")
     private ApplicationEntity application;
-    
+
     @Column(name = "trigger_events", nullable = false)
     private String[] triggerEvents;
-    
-    @Column(name = "min_severity", nullable = false)
+
+    @Enumerated(EnumType.STRING)
     @JdbcTypeCode(SqlTypes.NAMED_ENUM)
+    @Column(name = "min_severity", columnDefinition = "audit_severity")
     private SeverityEnum minSeverity;
 
     @Column(name = "channel_type", nullable = false)
@@ -53,7 +56,7 @@ public class AlertRulesEntity {
 
     @Column(name = "message_template")
     private String messageTemplate;
-    
+
     @Column(name = "is_active", nullable = false)
     private Boolean active;
 

@@ -1,5 +1,6 @@
 package com.audit.tracevault.infrastructure.adapters.out.persistence;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 
@@ -52,8 +53,13 @@ public class DashboardPersistenceAdapter implements DashboardRepositoryPort {
     }
 
     @Override
-    public List<RecentEventDTO> getRecentEvents(UUID applicationId, int limit) {
-        return dashboardRepository.getRecentEvents(applicationId, limit);
+    public List<RecentEventDTO> getRecentEvents(UUID applicationId) {
+        return dashboardRepository.getRecentEvents(applicationId);
+    }
+
+    @Override
+    public Instant getLastLogTimestamp(UUID applicationId) {
+        return dashboardRepository.getLastLogTimestamp(applicationId);
     }
 
 }

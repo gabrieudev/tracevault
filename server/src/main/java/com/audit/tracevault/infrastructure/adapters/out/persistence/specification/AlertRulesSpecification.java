@@ -6,6 +6,7 @@ import java.util.UUID;
 import org.springframework.data.jpa.domain.Specification;
 
 import com.audit.tracevault.core.domain.ChannelTypeEnum;
+import com.audit.tracevault.core.domain.SeverityEnum;
 import com.audit.tracevault.infrastructure.adapters.out.persistence.entity.AlertRulesEntity;
 
 public class AlertRulesSpecification {
@@ -17,8 +18,7 @@ public class AlertRulesSpecification {
                 ? cb.conjunction()
                 : cb.or(
                         cb.like(cb.lower(root.get("triggerEvents").as(String.class)), "%" + search.toLowerCase() + "%"),
-                        cb.like(cb.lower(root.get("messageTemplate")), "%" + search.toLowerCase() + "%")
-                    );
+                        cb.like(cb.lower(root.get("messageTemplate")), "%" + search.toLowerCase() + "%"));
     }
 
     public static Specification<AlertRulesEntity> hasId(UUID id) {
@@ -45,7 +45,7 @@ public class AlertRulesSpecification {
                 : cb.isTrue(root.get("triggerEvents").in((Object[]) triggerEvents));
     }
 
-    public static Specification<AlertRulesEntity> hasMinSeverity(String minSeverity) {
+    public static Specification<AlertRulesEntity> hasMinSeverity(SeverityEnum minSeverity) {
         return (root, query, cb) -> minSeverity == null
                 ? cb.conjunction()
                 : cb.equal(root.get("minSeverity"), minSeverity);

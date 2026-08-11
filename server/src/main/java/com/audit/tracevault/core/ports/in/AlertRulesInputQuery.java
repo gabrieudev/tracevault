@@ -4,6 +4,7 @@ import java.time.Instant;
 import java.util.UUID;
 
 import com.audit.tracevault.core.domain.ChannelTypeEnum;
+import com.audit.tracevault.core.domain.SeverityEnum;
 
 public record AlertRulesInputQuery(
         UUID id,
@@ -12,7 +13,7 @@ public record AlertRulesInputQuery(
         String messageTemplate,
         ChannelTypeEnum channelType,
         String[] triggerEvents,
-        String minSeverity,
+        SeverityEnum minSeverity,
         Boolean isActive,
         Instant createdFrom,
         Instant createdTo,

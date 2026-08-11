@@ -1,6 +1,7 @@
 import { useForm } from "@tanstack/react-form";
 import { Loader2, Plus } from "lucide-react";
 import { useEffect, useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 
 import {
 	Dialog,
@@ -82,27 +83,33 @@ export function CreateAlertDialog() {
 
 	useEffect(() => {
 		if (!open) {
-			form.reset();
-			reset();
+			const timeoutId = setTimeout(() => {
+				form.reset();
+				reset();
+			}, 300);
+			return () => clearTimeout(timeoutId);
 		}
 	}, [open, form, reset]);
 
 	return (
 		<Dialog open={open} onOpenChange={setOpen}>
 			<DialogTrigger asChild>
-				<Button className="gap-1.5">
+				<Button className="gap-1.5 transition-all active:scale-95">
 					<Plus className="h-4 w-4" />
 					Novo alerta
 				</Button>
 			</DialogTrigger>
 
-			<DialogContent className="sm:max-w-lg">
-				<form
+			<DialogContent className="sm:max-w-lg overflow-hidden">
+				<motion.form
+					initial={{ opacity: 0, y: 10 }}
+					animate={{ opacity: 1, y: 0 }}
+					transition={{ duration: 0.3, ease: "easeOut" }}
 					onSubmit={(e) => {
 						e.preventDefault();
 						void form.handleSubmit();
 					}}
-					className="space-y-4"
+					className="space-y-6"
 				>
 					<DialogHeader>
 						<DialogTitle>Novo alerta</DialogTitle>
@@ -112,129 +119,143 @@ export function CreateAlertDialog() {
 						</DialogDescription>
 					</DialogHeader>
 
-					<form.Field name="applicationId">
-						{(field) => (
-							<div className="space-y-1.5">
-								<Label>Aplicação</Label>
-								<SearchCombobox
-									className="w-full"
-									value={field.state.value}
-									onChange={(value) => field.handleChange(value ?? "")}
-									placeholder="Selecione a aplicação"
-									emptyText="Nenhuma aplicação encontrada."
-									options={(applicationsData?.content ?? []).map((app) => ({
-										label: app.name,
-										value: app.id,
-									}))}
-								/>
-
-								{field.state.meta.errors[0] && <p className="text-xs text-destructive">{field.state.meta.errors[0].message}</p>}
-							</div>
-						)}
-					</form.Field>
-
-					<div className="grid grid-cols-2 gap-4">
-						<form.Field name="channelType">
+					<div className="space-y-4 py-2">
+						<form.Field name="applicationId">
 							{(field) => (
-								<div className="space-y-1.5">
-									<Label>Canal</Label>
-									<Select
+								<div className="space-y-2">
+									<Label>Aplicação</Label>
+									<SearchCombobox
+										className="w-full transition-colors focus-visible:ring-primary/50"
 										value={field.state.value}
-										onValueChange={(v) => {
-											field.handleChange(v as ChannelType);
-											form.setFieldValue("destination", "");
-										}}
-									>
-										<SelectTrigger>
-											<SelectValue />
-										</SelectTrigger>
-										<SelectContent>
-											<SelectItem value="WEBHOOK">Webhook</SelectItem>
-											<SelectItem value="SLACK">Slack</SelectItem>
-											<SelectItem value="DISCORD">Discord</SelectItem>
-											<SelectItem value="EMAIL">E-mail</SelectItem>
-										</SelectContent>
-									</Select>
+										onChange={(value) => field.handleChange(value ?? "")}
+										placeholder="Selecione a aplicação"
+										emptyText="Nenhuma aplicação encontrada."
+										options={(applicationsData?.content ?? []).map((app) => ({
+											label: app.name,
+											value: app.id,
+										}))}
+									/>
+
+									{field.state.meta.errors[0] && (
+										<p className="text-[0.8rem] font-medium text-destructive">{field.state.meta.errors[0].message}</p>
+									)}
 								</div>
 							)}
 						</form.Field>
 
-						<form.Field name="minSeverity">
-							{(field) => (
-								<div className="space-y-1.5">
-									<Label>Severidade mínima</Label>
-									<Select
-										value={field.state.value}
-										onValueChange={(v) => field.handleChange(v as "INFO" | "WARNING" | "CRITICAL")}
-									>
-										<SelectTrigger>
-											<SelectValue />
-										</SelectTrigger>
-										<SelectContent>
-											<SelectItem value="INFO">Info</SelectItem>
-											<SelectItem value="WARNING">Atenção</SelectItem>
-											<SelectItem value="CRITICAL">Crítico</SelectItem>
-										</SelectContent>
-									</Select>
-								</div>
-							)}
-						</form.Field>
-					</div>
-
-					<form.Subscribe selector={(state) => state.values.channelType}>
-						{(channelType) => (
-							<form.Field name="destination">
+						<div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+							<form.Field name="channelType">
 								{(field) => (
-									<div className="space-y-1.5">
-										<Label htmlFor="destination">{DESTINATION_META[channelType].label}</Label>
-										<Input
-											id="destination"
+									<div className="space-y-2">
+										<Label>Canal</Label>
+										<Select
 											value={field.state.value}
-											onBlur={field.handleBlur}
-											onChange={(e) => field.handleChange(e.target.value)}
-											placeholder={DESTINATION_META[channelType].placeholder}
-											className="font-mono text-xs"
-										/>
-										{field.state.meta.errors[0] && (
-											<p className="text-xs text-destructive">{field.state.meta.errors[0].message}</p>
-										)}
+											onValueChange={(v) => {
+												field.handleChange(v as ChannelType);
+												form.setFieldValue("destination", "");
+											}}
+										>
+											<SelectTrigger className="transition-colors focus-visible:ring-primary/50">
+												<SelectValue />
+											</SelectTrigger>
+											<SelectContent>
+												<SelectItem value="WEBHOOK">Webhook</SelectItem>
+												<SelectItem value="SLACK">Slack</SelectItem>
+												<SelectItem value="DISCORD">Discord</SelectItem>
+												<SelectItem value="EMAIL">E-mail</SelectItem>
+											</SelectContent>
+										</Select>
 									</div>
 								)}
 							</form.Field>
-						)}
-					</form.Subscribe>
 
-					<form.Field name="triggerEvents">
-						{(field) => (
-							<div className="space-y-1.5">
-								<Label>Eventos de disparo</Label>
-								<EventsMultiSelect value={field.state.value} onChange={field.handleChange} />
-								{field.state.meta.errors[0] && <p className="text-xs text-destructive">{field.state.meta.errors[0].message}</p>}
-							</div>
-						)}
-					</form.Field>
+							<form.Field name="minSeverity">
+								{(field) => (
+									<div className="space-y-2">
+										<Label>Severidade mínima</Label>
+										<Select
+											value={field.state.value}
+											onValueChange={(v) => field.handleChange(v as "INFO" | "WARNING" | "CRITICAL")}
+										>
+											<SelectTrigger className="transition-colors focus-visible:ring-primary/50">
+												<SelectValue />
+											</SelectTrigger>
+											<SelectContent>
+												<SelectItem value="INFO">Info</SelectItem>
+												<SelectItem value="WARNING">Atenção</SelectItem>
+												<SelectItem value="CRITICAL">Crítico</SelectItem>
+											</SelectContent>
+										</Select>
+									</div>
+								)}
+							</form.Field>
+						</div>
 
-					<form.Field name="messageTemplate">
-						{(field) => (
-							<div className="space-y-1.5">
-								<Label htmlFor="messageTemplate">Mensagem (opcional)</Label>
-								<Textarea
-									id="messageTemplate"
-									rows={2}
-									placeholder="Ex: Novo evento crítico: {action} em {resourceType}"
-									value={field.state.value}
-									onBlur={field.handleBlur}
-									onChange={(e) => field.handleChange(e.target.value)}
-								/>
-							</div>
-						)}
-					</form.Field>
+						<form.Subscribe selector={(state) => state.values.channelType}>
+							{(channelType) => (
+								<form.Field name="destination">
+									{(field) => (
+										<div className="space-y-2">
+											<Label htmlFor="destination">{DESTINATION_META[channelType].label}</Label>
+											<Input
+												id="destination"
+												value={field.state.value}
+												onBlur={field.handleBlur}
+												onChange={(e) => field.handleChange(e.target.value)}
+												placeholder={DESTINATION_META[channelType].placeholder}
+												className="font-mono text-xs transition-colors focus-visible:ring-primary/50"
+											/>
+											{field.state.meta.errors[0] && (
+												<p className="text-[0.8rem] font-medium text-destructive">{field.state.meta.errors[0].message}</p>
+											)}
+										</div>
+									)}
+								</form.Field>
+							)}
+						</form.Subscribe>
 
-					{error && (
-						<p className="font-mono text-xs text-destructive">
-							Não foi possível criar o alerta. Verifique os dados e tente novamente.
-						</p>
-					)}
+						<form.Field name="triggerEvents">
+							{(field) => (
+								<div className="space-y-2">
+									<Label>Eventos de disparo</Label>
+									<EventsMultiSelect value={field.state.value} onChange={field.handleChange} />
+									{field.state.meta.errors[0] && (
+										<p className="text-[0.8rem] font-medium text-destructive">{field.state.meta.errors[0].message}</p>
+									)}
+								</div>
+							)}
+						</form.Field>
+
+						<form.Field name="messageTemplate">
+							{(field) => (
+								<div className="space-y-2">
+									<Label htmlFor="messageTemplate">Mensagem (opcional)</Label>
+									<Textarea
+										id="messageTemplate"
+										rows={2}
+										placeholder="Ex: Novo evento crítico: {action} em {resourceType}"
+										value={field.state.value}
+										onBlur={field.handleBlur}
+										onChange={(e) => field.handleChange(e.target.value)}
+										className="resize-none transition-colors focus-visible:ring-primary/50"
+									/>
+								</div>
+							)}
+						</form.Field>
+
+						<AnimatePresence>
+							{error && (
+								<motion.p
+									initial={{ opacity: 0, height: 0 }}
+									animate={{ opacity: 1, height: "auto" }}
+									exit={{ opacity: 0, height: 0 }}
+									className="font-mono text-xs text-destructive bg-destructive/10 p-2 rounded-md overflow-hidden"
+								>
+									Não foi possível criar o alerta. Verifique os dados e tente novamente.
+								</motion.p>
+							)}
+						</AnimatePresence>
+					</div>
 
 					<DialogFooter>
 						<form.Subscribe
@@ -243,14 +264,14 @@ export function CreateAlertDialog() {
 							})}
 						>
 							{({ isSubmitting }) => (
-								<Button type="submit" disabled={isSubmitting || isPending} className="gap-1.5">
+								<Button type="submit" disabled={isSubmitting || isPending} className="gap-2 w-full sm:w-auto transition-all">
 									{(isSubmitting || isPending) && <Loader2 className="h-4 w-4 animate-spin" />}
 									Criar alerta
 								</Button>
 							)}
 						</form.Subscribe>
 					</DialogFooter>
-				</form>
+				</motion.form>
 			</DialogContent>
 		</Dialog>
 	);
