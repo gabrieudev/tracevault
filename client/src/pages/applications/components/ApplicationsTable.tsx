@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { useNavigate } from "@tanstack/react-router";
 import { motion } from "framer-motion";
-import { ArrowUpRight, ChevronLeft, ChevronRight, Inbox } from "lucide-react";
+import { ArrowUpRight, Building2, ChevronLeft, ChevronRight, Inbox } from "lucide-react";
 import type { ApplicationResponseDTO, PageResponse } from "../types";
 
 interface ApplicationsTableProps {
@@ -172,7 +172,6 @@ export function ApplicationsTable({ data, isLoading, page, onPageChange }: Appli
 
 	return (
 		<div className="space-y-4">
-			{/* Table */}
 			<div className="overflow-hidden rounded-xl border bg-card shadow-sm">
 				<Table>
 					<TableHeader>
@@ -210,12 +209,10 @@ export function ApplicationsTable({ data, isLoading, page, onPageChange }: Appli
 								}}
 								className="group cursor-pointer border-b transition-colors last:border-0 hover:bg-muted/40 focus-visible:bg-muted/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-primary"
 							>
-								{/* Name */}
 								<TableCell className="relative py-4 pl-5">
 									<div className="flex items-center gap-3">
-										{/* Application indicator */}
 										<div className="flex size-8 shrink-0 items-center justify-center rounded-md border bg-muted/40 text-xs font-semibold text-muted-foreground transition-colors group-hover:border-primary/20 group-hover:bg-primary/10 group-hover:text-primary">
-											{application.name.charAt(0).toUpperCase()}
+											<Building2 className="w-4 h-4" />
 										</div>
 										<div className="min-w-0">
 											<div className="flex items-center gap-1.5">
@@ -226,19 +223,16 @@ export function ApplicationsTable({ data, isLoading, page, onPageChange }: Appli
 										</div>
 									</div>
 								</TableCell>
-								{/* Description */}
 								<TableCell className="hidden max-w-[320px] md:table-cell">
 									<span title={application.description || undefined} className="block truncate text-sm text-muted-foreground">
 										{application.description || "Sem descrição"}
 									</span>
 								</TableCell>
-								{/* Status */}
 								<TableCell>
 									<AnimatedBadge status={application.status === "ACTIVE" ? "success" : "danger"} size="sm">
 										{application.status === "ACTIVE" ? "Ativa" : "Inativa"}
 									</AnimatedBadge>
 								</TableCell>
-								{/* Created at */}
 								<TableCell className="hidden pr-5 lg:table-cell">
 									<span className="whitespace-nowrap font-mono text-xs text-muted-foreground">
 										{formatDate(application.createdAt)}
@@ -250,9 +244,7 @@ export function ApplicationsTable({ data, isLoading, page, onPageChange }: Appli
 				</Table>
 			</div>
 
-			{/* Pagination */}
 			<div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-				{/* Results */}
 				<div className="text-xs text-muted-foreground">
 					Mostrando{" "}
 					<span className="font-medium text-foreground">
@@ -261,7 +253,6 @@ export function ApplicationsTable({ data, isLoading, page, onPageChange }: Appli
 					de <span className="font-medium text-foreground"> {data.totalElements} </span> aplicações
 				</div>
 
-				{/* Controls */}
 				{totalPages > 1 && (
 					<div className="flex items-center gap-1">
 						<Button

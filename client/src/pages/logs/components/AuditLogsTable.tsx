@@ -11,7 +11,7 @@ import { AnimatedBadge } from "@/components/motion/animated-badge";
 interface AuditLogsTableProps {
 	data?: PageResponse<AuditLogResponseDTO>;
 	isLoading: boolean;
-	page: number;
+	page: number | undefined;
 	onPageChange: (page: number) => void;
 }
 
@@ -239,24 +239,30 @@ export function AuditLogsTable({ data, isLoading, page, onPageChange }: AuditLog
 						</Button>
 
 						<div className="flex items-center gap-1">
-							{paginationPages.map((item) =>
-								item.type === "ellipsis" ? (
-									<span key={item.key} className="flex size-8 items-center justify-center text-xs text-muted-foreground">
-										...
-									</span>
-								) : (
+							{paginationPages.map((item) => {
+								if (item.type === "ellipsis") {
+									return (
+										<span key={item.key} className="flex size-8 items-center justify-center text-xs text-muted-foreground">
+											...
+										</span>
+									);
+								}
+
+								const isActive = item.value === currentPage;
+
+								return (
 									<Button
 										key={item.key}
-										variant={item.value === currentPage ? "default" : "ghost"}
+										variant={isActive ? "default" : "ghost"}
 										size="icon"
 										className="size-8 text-xs"
-										aria-current={item.value === currentPage ? "page" : undefined}
+										aria-current={isActive ? "page" : undefined}
 										onClick={() => onPageChange(item.value)}
 									>
 										{item.value + 1}
 									</Button>
-								),
-							)}
+								);
+							})}
 						</div>
 
 						<Button

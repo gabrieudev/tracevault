@@ -96,16 +96,17 @@ public class SpringDataDashboardRepository {
     }
 
     public List<RecentEventDTO> getRecentEvents(UUID applicationId) {
+
         StringBuilder sql = new StringBuilder("""
-                    SELECT
-                        id,
-                        action,
-                        resource_type,
-                        resource_id,
-                        actor_name,
-                        severity,
-                        occurred_at
-                    FROM audit_log
+                SELECT
+                    id,
+                    action,
+                    resource_type,
+                    resource_id,
+                    actor_name,
+                    severity,
+                    occurred_at
+                FROM audit_log
                 """);
 
         List<Object> params = new ArrayList<>();
@@ -116,8 +117,8 @@ public class SpringDataDashboardRepository {
         }
 
         sql.append("""
-                    ORDER BY occurred_at DESC
-                    LIMIT ?
+                ORDER BY created_at DESC
+                LIMIT ?
                 """);
 
         params.add(DASHBOARD_LIMIT);
@@ -136,9 +137,10 @@ public class SpringDataDashboardRepository {
     }
 
     public Instant getLastLogTimestamp(UUID applicationId) {
+
         StringBuilder sql = new StringBuilder("""
-                    SELECT MAX(occurred_at) AS last_log_timestamp
-                    FROM audit_log
+                SELECT MAX(created_at) AS last_log_timestamp
+                FROM audit_log
                 """);
 
         List<Object> params = new ArrayList<>();
@@ -161,13 +163,14 @@ public class SpringDataDashboardRepository {
     }
 
     public StatMetricDTO getEventsToday(UUID applicationId) {
+
         StringBuilder sql = new StringBuilder("""
-                    SELECT
-                        COUNT(*) AS value,
-                        '+0%' AS delta,
-                        'FLAT' AS trend
-                    FROM audit_log
-                    WHERE occurred_at >= CURRENT_DATE
+                SELECT
+                    COUNT(*) AS value,
+                    '+0%' AS delta,
+                    'FLAT' AS trend
+                FROM audit_log
+                WHERE created_at >= CURRENT_DATE
                 """);
 
         List<Object> params = new ArrayList<>();
@@ -191,13 +194,13 @@ public class SpringDataDashboardRepository {
             int pulseWindowMinutes) {
 
         StringBuilder sql = new StringBuilder("""
-                    SELECT
-                        COUNT(*) AS value,
-                        '0%' AS delta,
-                        'FLAT' AS trend
-                    FROM audit_log
-                    WHERE severity = 'CRITICAL'
-                      AND occurred_at >= NOW() - (? * INTERVAL '1 minute')
+                SELECT
+                    COUNT(*) AS value,
+                    '0%' AS delta,
+                    'FLAT' AS trend
+                FROM audit_log
+                WHERE severity = 'CRITICAL'
+                  AND created_at >= NOW() - (? * INTERVAL '1 minute')
                 """);
 
         List<Object> params = new ArrayList<>();
@@ -220,15 +223,15 @@ public class SpringDataDashboardRepository {
     public StatMetricDTO getLoginFailures24h(
             UUID applicationId,
             int pulseWindowMinutes) {
-
+ 
         StringBuilder sql = new StringBuilder("""
-                    SELECT
-                        COUNT(*) AS value,
-                        '0%' AS delta,
-                        'FLAT' AS trend
-                    FROM audit_log
-                    WHERE action = 'LOGIN_FAILED'
-                      AND occurred_at >= NOW() - (? * INTERVAL '1 minute')
+                SELECT
+                    COUNT(*) AS value,
+                    '0%' AS delta,
+                    'FLAT' AS trend
+                FROM audit_log
+                WHERE action = 'LOGIN_FAILED'
+                  AND created_at >= NOW() - (? * INTERVAL '1 minute')
                 """);
 
         List<Object> params = new ArrayList<>();
@@ -253,18 +256,7 @@ public class SpringDataDashboardRepository {
             int pulseWindowMinutes) {
 
         StringBuilder sql = new StringBuilder("""
-                SELECT
-                    array_agg(
-                        to_char(t.bucket, 'YYYY-MM-DD HH24:MI')
-                        ORDER BY t.bucket
-                    ) AS timestamps,
-
-                    array_agg(
-                        COALESCE(l.cnt, 0)::int
-                        ORDER BY t.bucket
-                    ) AS data
-
-                FROM (
+                WITH time_buckets AS (
                     SELECT generate_series(
                         date_trunc(
                             'hour',
@@ -273,14 +265,13 @@ public class SpringDataDashboardRepository {
                         date_trunc('hour', NOW()),
                         '1 hour'::interval
                     ) AS bucket
-                ) t
-
-                LEFT JOIN (
+                ),
+                log_counts AS (
                     SELECT
-                        date_trunc('hour', occurred_at) AS bucket,
+                        date_trunc('hour', created_at) AS bucket,
                         COUNT(*) AS cnt
                     FROM audit_log
-                    WHERE occurred_at >= NOW() - (? * INTERVAL '1 minute')
+                    WHERE created_at >= NOW() - (? * INTERVAL '1 minute')
                 """);
 
         List<Object> params = new ArrayList<>();
@@ -297,8 +288,24 @@ public class SpringDataDashboardRepository {
         }
 
         sql.append("""
-                    GROUP BY date_trunc('hour', occurred_at)
-                ) l
+                    GROUP BY date_trunc('hour', created_at)
+                )
+                SELECT
+                    array_agg(
+                        to_char(
+                            t.bucket,
+                            'YYYY-MM-DD HH24:MI'
+                        )
+                        ORDER BY t.bucket
+                    ) AS timestamps,
+
+                    array_agg(
+                        COALESCE(l.cnt, 0)::int
+                        ORDER BY t.bucket
+                    ) AS data
+
+                FROM time_buckets t
+                LEFT JOIN log_counts l
                     ON t.bucket = l.bucket
                 """);
 

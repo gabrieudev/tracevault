@@ -1,11 +1,11 @@
-import { useEffect, useState } from "react";
 import { useNavigate, useSearch } from "@tanstack/react-router";
+import { useEffect, useState } from "react";
 
+import type { LogsSearch } from "@/routes/_app.logs.index";
 import { AuditLogsFilterBar } from "./components/AuditLogsFilterBar";
 import { AuditLogsTable } from "./components/AuditLogsTable";
-import { useAuditLogs } from "./use-audit-logs";
 import { useApplicationsForFilter } from "./use-applications-for-filter";
-import type { LogsSearch } from "@/routes/_app.logs.index";
+import { useAuditLogs } from "./use-audit-logs";
 
 const SEARCH_DEBOUNCE_MS = 400;
 
@@ -84,7 +84,7 @@ export function AuditLogsPage() {
 			<AuditLogsTable
 				data={data}
 				isLoading={isLoading}
-				page={page ?? 0}
+				page={page}
 				onPageChange={(nextPage) =>
 					updateSearch({
 						page: nextPage,

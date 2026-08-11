@@ -22,8 +22,10 @@ function buildQueryString(filters: ApplicationFilters): string {
 	if (filters.createdTo) params.set("createdTo", filters.createdTo);
 	if (filters.updatedFrom) params.set("updatedFrom", filters.updatedFrom);
 	if (filters.updatedTo) params.set("updatedTo", filters.updatedTo);
+
 	params.set("page", String(filters.page ?? 0));
 	params.set("size", String(filters.size ?? 10));
+	
 	filters.sort?.forEach((s) => {
 		params.append("sort", s);
 	});

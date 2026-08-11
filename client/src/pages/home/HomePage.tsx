@@ -72,12 +72,12 @@ export function Home() {
 			</div>
 
 			<Card className="overflow-hidden border-border bg-card shadow-sm transition-all duration-200">
-				<CardContent className="p-5 md:p-6">
+				<CardContent className="">
 					<div className="mb-4 flex items-center justify-between">
 						<div>
 							<h3 className="text-sm font-semibold text-foreground">Fluxo de eventos em tempo real</h3>
 							<p className="mt-0.5 font-mono text-[11px] text-muted-foreground">
-								POST /logs ·{" "}
+								POST /audit-logs ·{" "}
 								{homeData?.lastLogTimestamp
 									? new Date(homeData.lastLogTimestamp).toLocaleString("pt-BR")
 									: "Nenhum evento recebido ainda"}
