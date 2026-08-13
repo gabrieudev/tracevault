@@ -102,16 +102,22 @@ export function AuditLogsFilterBar({
 	}, [debouncedSearch, onSearchInputChange]);
 
 	useEffect(() => {
-		onFilterChange({
-			actorId: debouncedActorId || undefined,
-		});
-	}, [debouncedActorId, onFilterChange]);
+		const newValue = debouncedActorId || undefined;
+		if (filters.actorId !== newValue) {
+			onFilterChange({
+				actorId: newValue,
+			});
+		}
+	}, [debouncedActorId, filters.actorId, onFilterChange]);
 
 	useEffect(() => {
-		onFilterChange({
-			resourceType: debouncedResourceType || undefined,
-		});
-	}, [debouncedResourceType, onFilterChange]);
+		const newValue = debouncedResourceType || undefined;
+		if (filters.resourceType !== newValue) {
+			onFilterChange({
+				resourceType: newValue,
+			});
+		}
+	}, [debouncedResourceType, filters.resourceType, onFilterChange]);
 
 	return (
 		<div className="rounded-xl border bg-card/60 p-4 shadow-sm backdrop-blur-sm transition-all dark:bg-card/40">

@@ -14,10 +14,12 @@ function buildQueryString(filters: ApplicationFilters): string {
 	if (filters.id) params.set("id", filters.id);
 	if (filters.search) params.set("search", filters.search);
 	if (filters.name) params.set("name", filters.name);
+	
 	if (filters.description) params.set("description", filters.description);
 	filters.status?.forEach((status) => {
 		params.append("status", status);
 	});
+
 	if (filters.createdFrom) params.set("createdFrom", filters.createdFrom);
 	if (filters.createdTo) params.set("createdTo", filters.createdTo);
 	if (filters.updatedFrom) params.set("updatedFrom", filters.updatedFrom);

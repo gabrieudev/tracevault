@@ -1,5 +1,5 @@
 import { useNavigate, useSearch } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 
 import type { LogsSearch } from "@/routes/_app.logs.index";
 import { AuditLogsFilterBar } from "./components/AuditLogsFilterBar";
@@ -62,14 +62,22 @@ export function AuditLogsPage() {
 		};
 	}, [searchInput, search, navigate]);
 
-	function updateSearch(patch: Partial<LogsSearch>) {
+	const updateSearch = useCallback((patch: Partial<LogsSearch>) => {
 		navigate({
 			search: (prev) => ({
 				...prev,
 				...patch,
 			}),
 		});
-	}
+	}, [navigate]);
+
+	const handleFilterChange = useCallback((patch: Partial<LogsSearch>) => {
+		updateSearch({ ...patch, page: 0 });
+	}, [updateSearch]);
+
+	const handlePageChange = useCallback((nextPage: number) => {
+		updateSearch({ page: nextPage });
+	}, [updateSearch]);
 
 	return (
 		<div className="space-y-5">
@@ -77,7 +85,7 @@ export function AuditLogsPage() {
 				filters={{ search, applicationId, action, severity, actorId, resourceType, occurredFrom, occurredTo, page }}
 				searchInput={searchInput}
 				onSearchInputChange={setSearchInput}
-				onFilterChange={(patch) => updateSearch({ ...patch, page: 0 })}
+				onFilterChange={handleFilterChange}
 				applications={applicationsData?.content ?? []}
 			/>
 
@@ -85,11 +93,7 @@ export function AuditLogsPage() {
 				data={data}
 				isLoading={isLoading}
 				page={page}
-				onPageChange={(nextPage) =>
-					updateSearch({
-						page: nextPage,
-					})
-				}
+				onPageChange={handlePageChange}
 			/>
 		</div>
 	);
