@@ -117,7 +117,7 @@ public class SpringDataDashboardRepository {
         }
 
         sql.append("""
-                ORDER BY created_at DESC
+                ORDER BY occurred_at DESC
                 LIMIT ?
                 """);
 
@@ -139,7 +139,7 @@ public class SpringDataDashboardRepository {
     public Instant getLastLogTimestamp(UUID applicationId) {
 
         StringBuilder sql = new StringBuilder("""
-                SELECT MAX(created_at) AS last_log_timestamp
+                SELECT MAX(occurred_at) AS last_log_timestamp
                 FROM audit_log
                 """);
 
@@ -170,7 +170,7 @@ public class SpringDataDashboardRepository {
                     '+0%' AS delta,
                     'FLAT' AS trend
                 FROM audit_log
-                WHERE created_at >= CURRENT_DATE
+                WHERE occurred_at >= CURRENT_DATE
                 """);
 
         List<Object> params = new ArrayList<>();
@@ -200,7 +200,7 @@ public class SpringDataDashboardRepository {
                     'FLAT' AS trend
                 FROM audit_log
                 WHERE severity = 'CRITICAL'
-                  AND created_at >= NOW() - (? * INTERVAL '1 minute')
+                  AND occurred_at >= NOW() - (? * INTERVAL '1 minute')
                 """);
 
         List<Object> params = new ArrayList<>();
@@ -223,7 +223,7 @@ public class SpringDataDashboardRepository {
     public StatMetricDTO getLoginFailures24h(
             UUID applicationId,
             int pulseWindowMinutes) {
- 
+
         StringBuilder sql = new StringBuilder("""
                 SELECT
                     COUNT(*) AS value,
@@ -231,7 +231,7 @@ public class SpringDataDashboardRepository {
                     'FLAT' AS trend
                 FROM audit_log
                 WHERE action = 'LOGIN_FAILED'
-                  AND created_at >= NOW() - (? * INTERVAL '1 minute')
+                  AND occurred_at >= NOW() - (? * INTERVAL '1 minute')
                 """);
 
         List<Object> params = new ArrayList<>();
@@ -268,10 +268,10 @@ public class SpringDataDashboardRepository {
                 ),
                 log_counts AS (
                     SELECT
-                        date_trunc('hour', created_at) AS bucket,
+                        date_trunc('hour', occurred_at) AS bucket,
                         COUNT(*) AS cnt
                     FROM audit_log
-                    WHERE created_at >= NOW() - (? * INTERVAL '1 minute')
+                    WHERE occurred_at >= NOW() - (? * INTERVAL '1 minute')
                 """);
 
         List<Object> params = new ArrayList<>();
@@ -288,7 +288,7 @@ public class SpringDataDashboardRepository {
         }
 
         sql.append("""
-                    GROUP BY date_trunc('hour', created_at)
+                    GROUP BY date_trunc('hour', occurred_at)
                 )
                 SELECT
                     array_agg(
